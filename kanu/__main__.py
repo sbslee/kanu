@@ -8,7 +8,7 @@ from .version import __version__
 def _get_key(entry, container, root):
     openai.api_key = entry.get()
     container.pack_forget()
-    chat_container = create_chat_container(root)
+    chat_container = create_chat_container(root, container)
 
 def create_config_container(root):
     container = tk.Frame(root)
@@ -44,20 +44,27 @@ def _clear_session(session, messages):
     session.delete(1.0, tk.END)
     messages.clear()
 
-def create_chat_container(root):
+def _go_back(current, previous):
+    current.pack_forget()
+    previous.pack()
+
+def create_chat_container(root, previous):
     container = tk.Frame(root)
     container.pack()
     label = tk.Label(container, text="Chat session")
-    label.grid(row=0, column=0, columnspan=2)
+    label.grid(row=0, column=0, columnspan=3)
     messages = []
     session = tk.Text(container, width=70, height=20)
-    session.grid(row=1, column=0, columnspan=2)
+    session.grid(row=1, column=0, columnspan=3)
     entry = tk.Entry(container, width=70)
-    entry.grid(row=2, column=0, columnspan=2)
+    entry.grid(row=2, column=0, columnspan=3)
     send_button = tk.Button(container, text="Send", command=lambda: _send_message(session, entry, messages))
     send_button.grid(row=3, column=0)
     clear_butoon = tk.Button(container, text="Clear", command=lambda: _clear_session(session, messages))
     clear_butoon.grid(row=3, column=1)
+    back_button = tk.Button(container, text="Back", command=lambda: _go_back(container, previous))
+    back_button.grid(row=3, column=2)
+    return container
 
 def main():
     root = tk.Tk()
@@ -65,6 +72,8 @@ def main():
     root.geometry("800x700")
 
     config_container = create_config_container(root)
+    chat_container = create_chat_container(root, config_container)
+    chat_container.pack_forget()
 
     root.mainloop()
 
