@@ -19,35 +19,39 @@ class DocGPT:
         self.kanu.container = tk.Frame(self.kanu.root)
         self.kanu.container.pack()
         label = tk.Label(self.kanu.container, text="DocGPT")
-        label.grid(row=0, column=0, columnspan=2)
+        label.grid(row=0, column=0, columnspan=3)
+        back_button = tk.Button(self.kanu.container, text="Go back", command=lambda: self.kanu.docgpt_config())
+        back_button.grid(row=1, column=0)
+        back_button = tk.Button(self.kanu.container, text="Reload", command=lambda: self.run())
+        back_button.grid(row=1, column=2)
         label = tk.Message(self.kanu.container, width=300, text="Option 1. Create a new database")
-        label.grid(row=1, column=0, columnspan=2)
-        open_button = tk.Button(self.kanu.container, text="Browse", command=self._open_file)
-        open_button.grid(row=2, column=0)
-        f = tk.Label(self.kanu.container, text="Not selected", fg="red")
-        f.grid(row=2, column=1)
+        label.grid(row=2, column=0, columnspan=3)
+        f = tk.Label(self.kanu.container, text="Document:")
+        f.grid(row=3, column=0) 
+        self.document_file = tk.Label(self.kanu.container, text="Not selected", fg="red")
+        self.document_file.grid(row=3, column=1)
+        b = tk.Button(self.kanu.container, text="Browse", command=self.specify_document_file)
+        b.grid(row=3, column=2)
         l = tk.Label(self.kanu.container, text="Database:")
-        l.grid(row=3, column=0)
-        self.db_entry = tk.Entry(self.kanu.container)
-        self.db_entry.grid(row=3, column=1)
+        l.grid(row=4, column=0)       
+        self.new_database_directory = tk.Label(self.kanu.container, text="Not selected", fg="red")
+        self.new_database_directory.grid(row=4, column=1)
+        b = tk.Button(self.kanu.container, text="Browse", command=self.specify_new_database_directory)
+        b.grid(row=4, column=2)
         self.option1_button = tk.Button(self.kanu.container, text="Go with Option 1", command=self.ingest)
-        self.option1_button.grid(row=4, column=0, columnspan=2)
+        self.option1_button.grid(row=5, column=0, columnspan=3)
         self.option1_button["state"] = tk.DISABLED
         label = tk.Message(self.kanu.container, width=300, text="Option 2. Use an existing database")
-        label.grid(row=5, column=0, columnspan=2)
-        open_button = tk.Button(self.kanu.container, text="Browse", command=self._open_dir)
-        open_button.grid(row=6, column=0)
+        label.grid(row=6, column=0, columnspan=3)
+        f = tk.Label(self.kanu.container, text="Database:")
+        f.grid(row=7, column=0)
         self.db_dir = tk.Label(self.kanu.container, text="Not selected", fg="red")
-        self.db_dir.grid(row=6, column=1)
+        self.db_dir.grid(row=7, column=1)
+        open_button = tk.Button(self.kanu.container, text="Browse", command=self._open_dir)
+        open_button.grid(row=7, column=2)
         self.option2_button = tk.Button(self.kanu.container, text="Go with Option 2", command=self.skip)
-        self.option2_button.grid(row=7, column=0, columnspan=2)
+        self.option2_button.grid(row=8, column=0, columnspan=3)
         self.option2_button["state"] = tk.DISABLED
-        label = tk.Message(self.kanu.container, width=300, text="Alternatively, you ")
-        label.grid(row=8, column=0, columnspan=2)
-        back_button = tk.Button(self.kanu.container, text="Go back", command=lambda: self.kanu.docgpt_config())
-        back_button.grid(row=9, column=0)
-        back_button = tk.Button(self.kanu.container, text="Reload", command=lambda: self.run())
-        back_button.grid(row=9, column=1)
 
     def query(self):
         self.db = Chroma(persist_directory=self.db_entry.get(), embedding_function=OpenAIEmbeddings())
@@ -90,8 +94,8 @@ class DocGPT:
         db = None
         self.query()
 
-    def _open_file(self):
-        self.file_path = filedialog.askopenfilename()
+    def specify_document_file(self):
+        self.document_file.configure(text=filedialog.askopenfilename(), fg="lime green")
 
     def _open_dir(self):
         self.dir_path = filedialog.askdirectory()
@@ -100,3 +104,7 @@ class DocGPT:
 
     def _clear_session(self):
         self.session.delete(1.0, tk.END)
+
+    def specify_new_database_directory(self):
+        self.new_database_directory.configure(text=filedialog.askdirectory(), fg="lime green")
+        self.option1_button["state"] = tk.NORMAL
