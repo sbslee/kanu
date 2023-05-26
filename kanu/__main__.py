@@ -16,12 +16,12 @@ class KANU:
             self.container.pack_forget()
         self.container = tk.Frame(self.root)
         self.container.pack()
-        label = tk.Label(self.container, text="Welcome to KANU, a minimalistic Python-based chatbot GUI")
-        label.pack()
+        title_label = tk.Label(self.container, text="Welcome to KANU, a minimalistic Python-based GUI for various chatbots!")
+        title_label.pack()
         chatgpt_button = tk.Button(self.container, text="ChatGPT", command=lambda: self.chatgpt_config())
         chatgpt_button.pack()
-        docgpt = tk.Button(self.container, text="DocGPT", command=lambda: self.display(self.create_docgpt_config_container))
-        docgpt.pack()
+        docgpt_button = tk.Button(self.container, text="DocGPT", command=lambda: self.docgpt_config())
+        docgpt_button.pack()
 
     def chatgpt_config(self):
         self.container.pack_forget()
@@ -29,54 +29,52 @@ class KANU:
         self.container.pack()
         title_label = tk.Label(self.container, text="ChatGPT Configuration")
         title_label.grid(row=0, column=0, columnspan=2)
-        dependency_label = tk.Label(self.container, text="Required Packages:")
-        dependency_label.grid(row=1, column=0, columnspan=2)
-        package1_label = tk.Label(self.container, text="openai")
-        package1_label.grid(row=2, column=0)
-        print(importlib.util.find_spec("openai"))
-        install1_label = tk.Label(self.container, text="❌" if importlib.util.find_spec("openai") is None else "✅")
-        install1_label.grid(row=2, column=1)
+        self._list_dependencies(1, ["openai"])
         key_label = tk.Label(self.container, text="OpenAI API Key:")
         key_label.grid(row=3, column=0, columnspan=2)
         key_entry = tk.Entry(self.container)
         key_entry.grid(row=4, column=0, columnspan=2)
-        submit_button = tk.Button(self.container, text="Submit", command=lambda: self.chatgpt_run(key_entry.get()))
+        submit_button = tk.Button(self.container, text="Submit", command=lambda: self._deploy("ChatGPT", key_entry.get()))
         submit_button.grid(row=5, column=0)
         back_button = tk.Button(self.container, text="Back", command=lambda: self.create_home_container())
         back_button.grid(row=5, column=1)
 
-    def chatgpt_run(self, openai_key):
-        from .chatgpt import ChatGPT
-        chatgpt = ChatGPT(self, openai_key)
-        chatgpt.run()
-
-    def create_docgpt_config_container(self):
+    def docgpt_config(self):
+        self.container.pack_forget()
         self.container = tk.Frame(self.root)
         self.container.pack()
-        openai_label = tk.Label(self.container, text="OpenAI API Key:")
-        openai_label.grid(row=0, column=0)
-        huggingface_label = tk.Label(self.container, text="Hugging Face Write Token:")
-        huggingface_label.grid(row=1, column=0)
-        openai_key = tk.Entry(self.container)
-        openai_key.grid(row=0, column=1)
-        huggingface_key = tk.Entry(self.container)
-        huggingface_key.grid(row=1, column=1)
-        submit_button = tk.Button(self.container, text="Submit", command=lambda: self.display(self.create_docgpt_session_container, openai_key.get(), huggingface_key.get()))
-        submit_button.grid(row=2, column=0)
-        back_button = tk.Button(self.container, text="Back", command=lambda: self.display(self.create_home_container))
-        back_button.grid(row=2, column=1)
+        title_label = tk.Label(self.container, text="DocGPT Configuration")
+        title_label.grid(row=0, column=0, columnspan=2)
+        self._list_dependencies(1, ["langchain", "chromadb", "tiktoken"])
+        key_label = tk.Label(self.container, text="OpenAI API Key:")
+        key_label.grid(row=5, column=0, columnspan=2)
+        key_entry = tk.Entry(self.container)
+        key_entry.grid(row=6, column=0, columnspan=2)
+        submit_button = tk.Button(self.container, text="Submit", command=lambda: self._deploy("DocGPT", key_entry.get()))
+        submit_button.grid(row=7, column=0)
+        back_button = tk.Button(self.container, text="Back", command=lambda: self.create_home_container())
+        back_button.grid(row=7, column=1)
 
-    def create_docgpt_session_container(self, openai_key, huggingface_key):
-        openai.api_key = openai_key
-        model_id = "sentence-transformers/all-MiniLM-L6-v2"
-        api_url = f"https://api-inference.huggingface.co/pipeline/feature-extraction/{model_id}"
-        headers = {"Authorization": f"Bearer {huggingface_key}"}
-        self.container = tk.Frame(self.root)
-        self.container.pack()
+    def _deploy(self, agent, *args, **kwargs):
+        if agent == "ChatGPT":
+            from .chatgpt import ChatGPT
+            chatgpt = ChatGPT(self, *args, **kwargs)
+            chatgpt.run()
+        elif agent == "DocGPT":
+            from .docgpt import DocGPT
+            docgpt = DocGPT(self, *args, **kwargs)
+            docgpt.run()
+        else:
+            raise ValueError(f"Unknown agent {agent}")
 
-        def query(texts):
-            response = requests.post(api_url, headers=headers, json={"inputs": texts, "options":{"wait_for_model":True}})
-            return response.json()
+    def _list_dependencies(self, row, packages):
+        title = tk.Label(self.container, text="Required Packages:")
+        title.grid(row=row, column=0, columnspan=2)
+        for i, package in enumerate(packages, row+1):
+            name = tk.Label(self.container, text=package)
+            name.grid(row=i, column=0)
+            status = tk.Label(self.container, text="❌" if importlib.util.find_spec(package) is None else "✅")
+            status.grid(row=i, column=1)
 
 def main():
     root = tk.Tk()
