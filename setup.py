@@ -10,7 +10,6 @@ setup(
     description="A minimalistic Python-based chatbot GUI",
     url="https://github.com/sbslee/kanu",
     packages=find_packages(),
-    install_requires=["openai"],
     license="MIT",
     entry_points={"console_scripts": ["kanu=kanu.__main__:main"]},
     long_description="A minimalistic Python-based chatbot GUI",
