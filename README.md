@@ -8,6 +8,12 @@ KANU is a minimalistic Python-based GUI for various chatbots.
 $ pip install kanu
 ```
 
+## Running
+
+```
+$ kanu
+```
+
 ## Screenshots
 
 ### Homepage
