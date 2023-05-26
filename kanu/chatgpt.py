@@ -20,11 +20,11 @@ class ChatGPT:
         model2_button = tk.Radiobutton(self.kanu.container, variable=self.model, text="gpt-4", value="gpt-4")
         model1_button.grid(row=1, column=1)
         model2_button.grid(row=1, column=2)
-        session_label = tk.Label(self.kanu.container, text="Chat session")
+        session_label = tk.Label(self.kanu.container, text="Chat Session")
         session_label.grid(row=2, column=0, columnspan=3)
         self.session = tk.Text(self.kanu.container, width=70, height=20)
         self.session.grid(row=3, column=0, columnspan=3)
-        entry = tk.Entry(self.kanu.container, width=70)
+        entry = tk.Entry(self.kanu.container, width=54)
         entry.grid(row=4, column=0, columnspan=3)
         self.messages = []
         send_button = tk.Button(self.kanu.container, text="Send", command=lambda: self._send_message(entry))
