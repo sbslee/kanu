@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 0.2.0 (in development)
+## 0.2.0 (2023-03-27)
 * Enable users to initiate a new chat session.
 * Enable users to choose their preferred GPT model.
 * Enable users to chat with their documents.
