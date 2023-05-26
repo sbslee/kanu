@@ -18,12 +18,12 @@ class KANU:
         self.container.pack()
         label = tk.Label(self.container, text="Welcome to KANU, a minimalistic Python-based chatbot GUI")
         label.pack()
-        chatgpt_button = tk.Button(self.container, text="ChatGPT", command=lambda: self.create_chatgpt_config_container())
+        chatgpt_button = tk.Button(self.container, text="ChatGPT", command=lambda: self.chatgpt_config())
         chatgpt_button.pack()
         docgpt = tk.Button(self.container, text="DocGPT", command=lambda: self.display(self.create_docgpt_config_container))
         docgpt.pack()
 
-    def create_chatgpt_config_container(self):
+    def chatgpt_config(self):
         self.container.pack_forget()
         self.container = tk.Frame(self.root)
         self.container.pack()
@@ -33,18 +33,19 @@ class KANU:
         dependency_label.grid(row=1, column=0, columnspan=2)
         package1_label = tk.Label(self.container, text="openai")
         package1_label.grid(row=2, column=0)
+        print(importlib.util.find_spec("openai"))
         install1_label = tk.Label(self.container, text="❌" if importlib.util.find_spec("openai") is None else "✅")
         install1_label.grid(row=2, column=1)
         key_label = tk.Label(self.container, text="OpenAI API Key:")
         key_label.grid(row=3, column=0, columnspan=2)
         key_entry = tk.Entry(self.container)
         key_entry.grid(row=4, column=0, columnspan=2)
-        submit_button = tk.Button(self.container, text="Submit", command=lambda: self.create_chatgpt_session_container(key_entry.get()))
+        submit_button = tk.Button(self.container, text="Submit", command=lambda: self.chatgpt_run(key_entry.get()))
         submit_button.grid(row=5, column=0)
         back_button = tk.Button(self.container, text="Back", command=lambda: self.create_home_container())
         back_button.grid(row=5, column=1)
 
-    def create_chatgpt_session_container(self, openai_key):
+    def chatgpt_run(self, openai_key):
         from .chatgpt import ChatGPT
         chatgpt = ChatGPT(self, openai_key)
         chatgpt.run()
