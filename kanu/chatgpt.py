@@ -20,7 +20,7 @@ class ChatGPT:
         model2_button = tk.Radiobutton(self.kanu.container, variable=self.model, text="gpt-4", value="gpt-4")
         model1_button.grid(row=1, column=1)
         model2_button.grid(row=1, column=2)
-        session_label = tk.Label(self.kanu.container, text="Chat Session")
+        session_label = tk.Label(self.kanu.container, text="Chat session")
         session_label.grid(row=2, column=0, columnspan=3)
         self.session = tk.Text(self.kanu.container, width=70, height=20)
         self.session.grid(row=3, column=0, columnspan=3)
@@ -31,7 +31,7 @@ class ChatGPT:
         send_button.grid(row=5, column=0)
         clear_butoon = tk.Button(self.kanu.container, text="Clear", command=lambda: self._clear_session())
         clear_butoon.grid(row=5, column=1)
-        back_button = tk.Button(self.kanu.container, text="Back", command=lambda: self.kanu.chatgpt_config())
+        back_button = tk.Button(self.kanu.container, text="Go back", command=lambda: self.kanu.chatgpt_config())
         back_button.grid(row=5, column=2)
 
     def _send_message(self, entry):
@@ -44,8 +44,8 @@ class ChatGPT:
         )
         response = bot_response["choices"][0]["message"]["content"]
         self.messages += [{"role": "assistant", "content": response}]
-        self.session.insert(tk.END, "\nYou: " + entry.get())
-        self.session.insert(tk.END, f"\nBot ({self.model.get()}): " + response)
+        self.session.insert(tk.END, "You: " + entry.get() + "\n")
+        self.session.insert(tk.END, f"Bot ({self.model.get()}): " + response + "\n")
         entry.delete(0, tk.END)
 
     def _clear_session(self):
