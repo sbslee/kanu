@@ -1,3 +1,3 @@
 # README
 
-KANU is a Pythonic minimalistic chatbot GUI.
+KANU is a minimalistic Python-based chatbot GUI.
