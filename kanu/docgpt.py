@@ -1,14 +1,16 @@
 import os
+import glob
 import tkinter as tk
 from tkinter import filedialog
 
 from langchain.embeddings.openai import OpenAIEmbeddings
-from langchain.text_splitter import CharacterTextSplitter
+from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import Chroma
-from langchain.llms import OpenAI
 from langchain.chat_models import ChatOpenAI
-from langchain.document_loaders import TextLoader
 from langchain.chains import RetrievalQA
+from langchain.document_loaders import TextLoader
+
+DOCUMENT_LOADERS = {".txt": TextLoader}
 
 class DocGPT:
     def __init__(self, kanu, openai_key, model):
@@ -30,9 +32,9 @@ class DocGPT:
         label.grid(row=2, column=0, columnspan=3)
         f = tk.Label(self.kanu.container, text="Document:")
         f.grid(row=3, column=0) 
-        self.document_label = tk.Label(self.kanu.container, text="No file selected", fg="red")
+        self.document_label = tk.Label(self.kanu.container, text="No directory selected", fg="red")
         self.document_label.grid(row=3, column=1)
-        b = tk.Button(self.kanu.container, text="Browse", command=self.specify_document_file)
+        b = tk.Button(self.kanu.container, text="Browse", command=self.specify_document_directory)
         b.grid(row=3, column=2)
         l = tk.Label(self.kanu.container, text="Database:")
         l.grid(row=4, column=0)       
@@ -81,12 +83,20 @@ class DocGPT:
         entry.delete(0, tk.END)
 
     def go_with_option1(self):
-        loader = TextLoader(self.document_file)
-        documents = loader.load()
-        text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
-        docs = text_splitter.split_documents(documents)
-        embeddings = OpenAIEmbeddings()
-        db = Chroma.from_documents(docs, embeddings, persist_directory=self.database_directory)
+        documents = []
+        for root, dirs, files in os.walk(self.document_directory):
+            for file in files:
+                file_path = os.path.join(root, file)
+                file_ext = os.path.splitext(file_path)[1]
+                if file_ext not in DOCUMENT_LOADERS:
+                    continue
+                loader = DOCUMENT_LOADERS[file_ext](file_path)
+                document = loader.load()[0]
+                documents.append(document)
+        text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=50)
+        texts = text_splitter.split_documents(documents)
+        db = Chroma.from_documents(texts, OpenAIEmbeddings(), persist_directory=self.database_directory)
+        db.add_documents(texts)    
         db.persist()
         db = None
         self.query()
@@ -94,12 +104,12 @@ class DocGPT:
     def go_with_option2(self):
         self.query()
 
-    def specify_document_file(self):
-        file_path = filedialog.askopenfilename()
-        if not file_path:
+    def specify_document_directory(self):
+        directory_path = filedialog.askdirectory()
+        if not directory_path:
             return
-        self.document_file = file_path
-        self.document_label.configure(text=os.path.basename(file_path), fg="lime green")
+        self.document_directory = directory_path
+        self.document_label.configure(text=os.path.basename(directory_path), fg="lime green")
         if self.new_database_label["text"] != "No directory selected":
             self.option1_button["state"] = tk.NORMAL
 
