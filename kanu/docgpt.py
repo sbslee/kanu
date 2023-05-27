@@ -67,14 +67,14 @@ class DocGPT:
         self.session.grid(row=1, column=0, columnspan=3)
         e = tk.Entry(self.kanu.container, width=54)
         e.grid(row=2, column=0, columnspan=3)
-        b = tk.Button(self.kanu.container, text="Send", command=lambda: self._send_message(e))
+        b = tk.Button(self.kanu.container, text="Send", command=lambda: self.send_message(e))
         b.grid(row=3, column=0)
         b = tk.Button(self.kanu.container, text="Clear", command=lambda: self.clear_session())
         b.grid(row=3, column=1)
         b = tk.Button(self.kanu.container, text="Go back", command=lambda: self.run())
         b.grid(row=3, column=2)
 
-    def _send_message(self, entry):
+    def send_message(self, entry):
         self.session.insert(tk.END, "You: " + entry.get() + "\n")
         response = self.qa(entry.get())["result"]
         self.session.insert(tk.END, "Bot:" + response + "\n")

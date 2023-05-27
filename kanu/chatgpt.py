@@ -19,14 +19,14 @@ class ChatGPT:
         e = tk.Entry(self.kanu.container, width=54)
         e.grid(row=2, column=0, columnspan=3)
         self.messages = []
-        b = tk.Button(self.kanu.container, text="Send", command=lambda: self._send_message(e))
+        b = tk.Button(self.kanu.container, text="Send", command=lambda: self.send_message(e))
         b.grid(row=3, column=0)
         b = tk.Button(self.kanu.container, text="Clear", command=lambda: self.clear_session())
         b.grid(row=3, column=1)
         b = tk.Button(self.kanu.container, text="Go back", command=lambda: self.kanu.config_chatgpt())
         b.grid(row=3, column=2)
 
-    def _send_message(self, entry):
+    def send_message(self, entry):
         if not self.messages:
             self.messages.append({"role": "system", "content": "You are a helpful assistant."})
         self.messages += [{"role": "user", "content": entry.get()}]
