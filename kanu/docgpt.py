@@ -8,9 +8,12 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import Chroma
 from langchain.chat_models import ChatOpenAI
 from langchain.chains import RetrievalQA
-from langchain.document_loaders import TextLoader
+from langchain.document_loaders import TextLoader, PDFMinerLoader
 
-DOCUMENT_LOADERS = {".txt": TextLoader}
+DOCUMENT_LOADERS = {
+    ".txt": TextLoader,
+    ".pdf": PDFMinerLoader,
+}
 
 class DocGPT:
     def __init__(self, kanu, openai_key, model):
