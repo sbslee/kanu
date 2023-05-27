@@ -6,12 +6,14 @@ from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.vectorstores import Chroma
 from langchain.llms import OpenAI
+from langchain.chat_models import ChatOpenAI
 from langchain.document_loaders import TextLoader
 from langchain.chains import RetrievalQA
 
 class DocGPT:
-    def __init__(self, kanu, openai_key):
+    def __init__(self, kanu, openai_key, model):
         self.kanu = kanu
+        self.model = model
         os.environ["OPENAI_API_KEY"] = openai_key
 
     def run(self):
@@ -20,7 +22,7 @@ class DocGPT:
         self.kanu.container.pack()
         label = tk.Label(self.kanu.container, text="DocGPT")
         label.grid(row=0, column=0, columnspan=3)
-        back_button = tk.Button(self.kanu.container, text="Go back", command=lambda: self.kanu.docgpt_config())
+        back_button = tk.Button(self.kanu.container, text="Go back", command=lambda: self.kanu.config_docgpt())
         back_button.grid(row=1, column=0)
         back_button = tk.Button(self.kanu.container, text="Reload", command=lambda: self.run())
         back_button.grid(row=1, column=2)
@@ -55,24 +57,22 @@ class DocGPT:
 
     def query(self):
         self.db = Chroma(persist_directory=self.database_directory, embedding_function=OpenAIEmbeddings())
-        self.qa = RetrievalQA.from_chain_type(llm=OpenAI(), chain_type="stuff", retriever=self.db.as_retriever())
+        self.qa = RetrievalQA.from_chain_type(llm=ChatOpenAI(model_name=self.model), chain_type="stuff", retriever=self.db.as_retriever())
         self.kanu.container.pack_forget()
         self.kanu.container = tk.Frame(self.kanu.root)
         self.kanu.container.pack()
-        title_label = tk.Label(self.kanu.container, text="DocGPT")
-        title_label.grid(row=0, column=0, columnspan=3)
-        session_label = tk.Label(self.kanu.container, text="Chat session")
-        session_label.grid(row=1, column=0, columnspan=3)
+        l = tk.Label(self.kanu.container, text="DocGPT")
+        l.grid(row=0, column=0, columnspan=3)    
         self.session = tk.Text(self.kanu.container, width=70, height=20)
-        self.session.grid(row=2, column=0, columnspan=3)
-        entry = tk.Entry(self.kanu.container, width=54)
-        entry.grid(row=3, column=0, columnspan=3)
-        send_button = tk.Button(self.kanu.container, text="Send", command=lambda: self._send_message(entry))
-        send_button.grid(row=4, column=0)
-        clear_butoon = tk.Button(self.kanu.container, text="Clear", command=lambda: self.clear_session())
-        clear_butoon.grid(row=4, column=1)
-        back_button = tk.Button(self.kanu.container, text="Go back", command=lambda: self.run())
-        back_button.grid(row=4, column=2)
+        self.session.grid(row=1, column=0, columnspan=3)
+        e = tk.Entry(self.kanu.container, width=54)
+        e.grid(row=2, column=0, columnspan=3)
+        b = tk.Button(self.kanu.container, text="Send", command=lambda: self._send_message(e))
+        b.grid(row=3, column=0)
+        b = tk.Button(self.kanu.container, text="Clear", command=lambda: self.clear_session())
+        b.grid(row=3, column=1)
+        b = tk.Button(self.kanu.container, text="Go back", command=lambda: self.run())
+        b.grid(row=3, column=2)
 
     def _send_message(self, entry):
         self.session.insert(tk.END, "You: " + entry.get() + "\n")
