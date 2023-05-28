@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import ttk
 import importlib.util
 
 from .version import __version__
@@ -82,24 +83,34 @@ class KANU:
         l.grid(row=5, column=0, columnspan=2)
         name = tk.Label(self.container, text="pdfminer.six ⓘ")
         name.grid(row=6, column=0)
-        tooltip = Tooltip(name, "The pdfminer.six package is required only for processing PDF documents.")
-        status = tk.Label(self.container, text="❌" if importlib.util.find_spec("pdfminer") is None else "✅")
-        status.grid(row=6, column=1)
+        tooltip = Tooltip(name, "Required for .pdf documents.")
+        l = tk.Label(self.container, text="❌" if importlib.util.find_spec("pdfminer") is None else "✅")
+        l.grid(row=6, column=1)
+        name = tk.Label(self.container, text="unstructured ⓘ")
+        name.grid(row=7, column=0)
+        tooltip = Tooltip(name, "Required for .doc and .docx documents.")
+        l = tk.Label(self.container, text="❌" if importlib.util.find_spec("unstructured") is None else "✅")
+        l.grid(row=7, column=1)
+        name = tk.Label(self.container, text="tabulate ⓘ")
+        name.grid(row=8, column=0)
+        tooltip = Tooltip(name, "Required for .doc and .docx documents.")
+        l = tk.Label(self.container, text="❌" if importlib.util.find_spec("tabulate") is None else "✅")
+        l.grid(row=8, column=1)
         self.model = tk.StringVar(self.container, value="gpt-3.5-turbo")
         l = tk.Label(self.container, text="Model:")
-        l.grid(row=7, column=0, columnspan=2)
-        b = tk.Radiobutton(self.container, variable=self.model, text="gpt-3.5-turbo", value="gpt-3.5-turbo")
-        b.grid(row=8, column=0)
-        b = tk.Radiobutton(self.container, variable=self.model, text="gpt-4", value="gpt-4")
-        b.grid(row=8, column=1)
-        l = tk.Label(self.container, text="OpenAI API key:")
         l.grid(row=9, column=0, columnspan=2)
+        b = tk.Radiobutton(self.container, variable=self.model, text="gpt-3.5-turbo", value="gpt-3.5-turbo")
+        b.grid(row=10, column=0)
+        b = tk.Radiobutton(self.container, variable=self.model, text="gpt-4", value="gpt-4")
+        b.grid(row=10, column=1)
+        l = tk.Label(self.container, text="OpenAI API key:")
+        l.grid(row=11, column=0, columnspan=2)
         e = tk.Entry(self.container)
-        e.grid(row=10, column=0, columnspan=2)
+        e.grid(row=12, column=0, columnspan=2)
         b = tk.Button(self.container, text="Submit", command=lambda: self.deploy_agent("DocGPT", e.get(), self.model.get()))
-        b.grid(row=11, column=0)
+        b.grid(row=13, column=0)
         b = tk.Button(self.container, text="Go back", command=lambda: self.homepage())
-        b.grid(row=11, column=1)
+        b.grid(row=13, column=1)
 
     def deploy_agent(self, agent, *args, **kwargs):
         if agent == "ChatGPT":

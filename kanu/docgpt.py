@@ -8,11 +8,18 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import Chroma
 from langchain.chat_models import ChatOpenAI
 from langchain.chains import RetrievalQA
-from langchain.document_loaders import TextLoader, PDFMinerLoader
+
+from langchain.document_loaders import (
+    TextLoader,
+    PDFMinerLoader,
+    UnstructuredWordDocumentLoader
+)
 
 DOCUMENT_LOADERS = {
     ".txt": TextLoader,
     ".pdf": PDFMinerLoader,
+    ".doc": UnstructuredWordDocumentLoader,
+    ".docx": UnstructuredWordDocumentLoader,
 }
 
 class DocGPT:

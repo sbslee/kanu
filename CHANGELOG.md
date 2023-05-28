@@ -2,12 +2,12 @@
 
 ## 0.3.0 (in development)
 * Add multi-document chat functionality.
-* Enable chatting with PDF documents.
+* Add chat functionality for additional document formats (.pdf, .doc, and .docx)
 
 ## 0.2.0 (2023-03-27)
 * Enable users to initiate a new chat session.
 * Enable users to choose their preferred GPT model.
-* Enable users to chat with their documents.
+* Enable users to chat with their text documents (.txt).
 
 ## 0.1.0 (2023-03-24)
 * Initial release.
