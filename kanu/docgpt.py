@@ -14,6 +14,8 @@ from langchain.document_loaders import (
     UnstructuredWordDocumentLoader
 )
 
+from .utils import Tooltip
+
 DOCUMENT_LOADERS = {
     ".txt": TextLoader,
     ".pdf": PDFMinerLoader,
@@ -31,37 +33,40 @@ class DocGPT:
         self.kanu.container.pack_forget()
         self.kanu.container = tk.Frame(self.kanu.root)
         self.kanu.container.pack()
-        label = tk.Label(self.kanu.container, text="DocGPT")
-        label.grid(row=0, column=0, columnspan=3)
-        back_button = tk.Button(self.kanu.container, text="Go back", command=lambda: self.kanu.config_docgpt())
-        back_button.grid(row=1, column=0)
-        back_button = tk.Button(self.kanu.container, text="Reload", command=lambda: self.run())
-        back_button.grid(row=1, column=2)
-        label = tk.Message(self.kanu.container, width=300, text="Option 1. Create a new database")
-        label.grid(row=2, column=0, columnspan=3)
-        f = tk.Label(self.kanu.container, text="Document:")
-        f.grid(row=3, column=0) 
-        self.document_label = tk.Label(self.kanu.container, text="No directory selected", fg="red")
+        l = tk.Label(self.kanu.container, text="DocGPT")
+        l.grid(row=0, column=0, columnspan=3)
+        b = tk.Button(self.kanu.container, text="Go back", command=lambda: self.kanu.config_docgpt())
+        b.grid(row=1, column=0)
+        b = tk.Button(self.kanu.container, text="Reload", command=lambda: self.run())
+        b.grid(row=1, column=2)
+        l = tk.Message(self.kanu.container, width=300, text="Option 1. Create a new database")
+        l.grid(row=2, column=0, columnspan=3)
+        l = tk.Label(self.kanu.container, text="Document ⓘ:")
+        Tooltip(l, "Directory containing documents for the database.")
+        l.grid(row=3, column=0) 
+        self.document_label = tk.Label(self.kanu.container, text="Not selected", fg="red")
         self.document_label.grid(row=3, column=1)
         b = tk.Button(self.kanu.container, text="Browse", command=self.specify_document_directory)
         b.grid(row=3, column=2)
-        l = tk.Label(self.kanu.container, text="Database:")
+        l = tk.Label(self.kanu.container, text="Database ⓘ:")
+        Tooltip(l, "Directory where the database will be stored.")
         l.grid(row=4, column=0)       
-        self.new_database_label = tk.Label(self.kanu.container, text="No directory selected", fg="red")
+        self.new_database_label = tk.Label(self.kanu.container, text="Not selected", fg="red")
         self.new_database_label.grid(row=4, column=1)
         b = tk.Button(self.kanu.container, text="Browse", command=self.specify_new_database_directory)
         b.grid(row=4, column=2)
         self.option1_button = tk.Button(self.kanu.container, text="Go with Option 1", command=self.go_with_option1)
         self.option1_button.grid(row=5, column=0, columnspan=3)
         self.option1_button["state"] = tk.DISABLED
-        label = tk.Message(self.kanu.container, width=300, text="Option 2. Use an existing database")
-        label.grid(row=6, column=0, columnspan=3)
-        f = tk.Label(self.kanu.container, text="Database:")
-        f.grid(row=7, column=0)
-        self.old_database_label = tk.Label(self.kanu.container, text="No directory selected", fg="red")
+        l = tk.Message(self.kanu.container, width=300, text="Option 2. Use an existing database")
+        l.grid(row=6, column=0, columnspan=3)
+        l = tk.Label(self.kanu.container, text="Database ⓘ:")
+        Tooltip(l, "Directory where the database is stored.")
+        l.grid(row=7, column=0)
+        self.old_database_label = tk.Label(self.kanu.container, text="Not selected", fg="red")
         self.old_database_label.grid(row=7, column=1)
-        open_button = tk.Button(self.kanu.container, text="Browse", command=self.specify_old_database_directory)
-        open_button.grid(row=7, column=2)
+        b = tk.Button(self.kanu.container, text="Browse", command=self.specify_old_database_directory)
+        b.grid(row=7, column=2)
         self.option2_button = tk.Button(self.kanu.container, text="Go with Option 2", command=self.go_with_option2)
         self.option2_button.grid(row=8, column=0, columnspan=3)
         self.option2_button["state"] = tk.DISABLED
@@ -119,7 +124,7 @@ class DocGPT:
             return
         self.document_directory = directory_path
         self.document_label.configure(text=os.path.basename(directory_path), fg="lime green")
-        if self.new_database_label["text"] != "No directory selected":
+        if self.new_database_label["text"] != "Not selected":
             self.option1_button["state"] = tk.NORMAL
 
     def specify_new_database_directory(self):

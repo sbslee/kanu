@@ -5,13 +5,13 @@ import openai
 class ChatGPT:
     def __init__(self, kanu, openai_key, model):
         self.kanu = kanu
-        self.kanu.container.pack_forget()
-        self.kanu.container = tk.Frame(self.kanu.root)
-        self.kanu.container.pack()
         self.model = model
         openai.api_key = openai_key
 
     def run(self):
+        self.kanu.container.pack_forget()
+        self.kanu.container = tk.Frame(self.kanu.root)
+        self.kanu.container.pack()
         l = tk.Label(self.kanu.container, text="ChatGPT")
         l.grid(row=0, column=0, columnspan=3)
         self.session = tk.Text(self.kanu.container, width=70, height=20)

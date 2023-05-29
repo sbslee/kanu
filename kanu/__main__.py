@@ -97,7 +97,7 @@ class KANU:
         l = tk.Label(self.container, text=package_name)
         l.grid(row=row, column=0)
         l = tk.Label(self.container, text="❌" if importlib.util.find_spec(package_name) is None else "✅")
-        l.grid(row=row, column=1)        
+        l.grid(row=row, column=1) 
 
     def display_optional_dependency(self, row, package_name, package_import, tooltip):
         l = tk.Label(self.container, text=f"{package_name} ⓘ")
