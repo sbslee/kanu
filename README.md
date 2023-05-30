@@ -23,3 +23,7 @@ $ pip install kanu
 ```
 $ kanu
 ```
+
+## Changelog
+
+See the CHANGELOG.md file for details.
