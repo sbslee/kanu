@@ -26,4 +26,4 @@ $ kanu
 
 ## Changelog
 
-See the ![CHANGELOG.md](./CHANGELOG.md) file for details.
+See the [CHANGELOG.md](./CHANGELOG.md) file for details.
