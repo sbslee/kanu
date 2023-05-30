@@ -3,9 +3,10 @@ import tkinter as tk
 import openai
 
 class ChatGPT:
-    def __init__(self, kanu, openai_key, model):
+    def __init__(self, kanu, openai_key, model, temperature):
         self.kanu = kanu
         self.model = model
+        self.temperature = temperature
         openai.api_key = openai_key
 
     def run(self):
@@ -33,6 +34,7 @@ class ChatGPT:
         bot_response = openai.ChatCompletion.create(
             model=self.model,
             messages=self.messages,
+            temperature=self.temperature,
         )
         response = bot_response["choices"][0]["message"]["content"]
         self.messages += [{"role": "assistant", "content": response}]
