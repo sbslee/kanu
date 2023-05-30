@@ -93,7 +93,7 @@ class DocGPT:
     def send_message(self, entry):
         self.session.insert(tk.END, "You: " + entry.get() + "\n")
         response = self.qa(entry.get())["result"]
-        self.session.insert(tk.END, "Bot:" + response + "\n")
+        self.session.insert(tk.END, "Bot: " + response + "\n")
         entry.delete(0, tk.END)
 
     def go_with_option1(self):
