@@ -6,11 +6,11 @@ KANU is a minimalistic Python-based GUI for various chatbots.
 
 ### ChatGPT
 
-![Alt Text](./images/chatgpt.gif)
+![Alt Text](https://raw.githubusercontent.com/sbslee/kanu/main/images/chatgpt.gif)
 
 ### DocGPT
 
-![Alt Text](./images/docgpt.gif)
+![Alt Text](https://raw.githubusercontent.com/sbslee/kanu/main/images/docgpt.gif)
 
 ## Installation
 

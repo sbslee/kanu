@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 0.3.0 (in development)
+## 0.3.0 (2023-03-30)
 * Add multi-document chat functionality.
 * Add chat functionality for additional document formats (.pdf, .doc, and .docx).
 
