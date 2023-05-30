@@ -22,8 +22,7 @@ $ kanu
 
 ### ChatGPT
 
-![Alt Text](./images/chatgpt-1.png)
-![Alt Text](./images/chatgpt-2.png)
+![Alt Text](./images/chatgpt.gif)
 
 ### DocGPT
 
