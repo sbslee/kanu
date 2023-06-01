@@ -7,6 +7,7 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import Chroma
 from langchain.chat_models import ChatOpenAI
 from langchain.chains import RetrievalQA
+from langchain.prompts import PromptTemplate
 
 from langchain.document_loaders import (
     TextLoader,
@@ -22,11 +23,11 @@ DOCUMENT_LOADERS = {
     ".doc": UnstructuredWordDocumentLoader,
     ".docx": UnstructuredWordDocumentLoader,
 }
-
 class DocGPT:
-    def __init__(self, kanu, openai_key, model):
+    def __init__(self, kanu, openai_key, model, prompt):
         self.kanu = kanu
         self.model = model
+        self.prompt = prompt
         os.environ["OPENAI_API_KEY"] = openai_key
 
     def run(self):
@@ -39,8 +40,8 @@ class DocGPT:
         b.grid(row=1, column=0)
         b = tk.Button(self.kanu.container, text="Reload", command=lambda: self.run())
         b.grid(row=1, column=2)
-        l = tk.Message(self.kanu.container, width=300, text="Option 1. Create a new database")
-        l.grid(row=2, column=0, columnspan=3)
+        m = tk.Message(self.kanu.container, width=300, text="Option 1. Create a new database")
+        m.grid(row=2, column=0, columnspan=3)
         l = tk.Label(self.kanu.container, text="Document ⓘ:")
         Tooltip(l, "Directory containing documents for the database.")
         l.grid(row=3, column=0) 
@@ -70,8 +71,8 @@ class DocGPT:
         self.option1_button = tk.Button(self.kanu.container, text="Go with Option 1", command=self.go_with_option1)
         self.option1_button.grid(row=7, column=0, columnspan=3)
         self.option1_button["state"] = tk.DISABLED
-        l = tk.Message(self.kanu.container, width=300, text="Option 2. Use an existing database")
-        l.grid(row=8, column=0, columnspan=3)
+        m = tk.Message(self.kanu.container, width=300, text="Option 2. Use an existing database")
+        m.grid(row=8, column=0, columnspan=3)
         l = tk.Label(self.kanu.container, text="Database ⓘ:")
         Tooltip(l, "Directory where the database is stored.")
         l.grid(row=9, column=0)
@@ -85,7 +86,12 @@ class DocGPT:
 
     def query(self):
         self.db = Chroma(persist_directory=self.database_directory, embedding_function=OpenAIEmbeddings())
-        self.qa = RetrievalQA.from_chain_type(llm=ChatOpenAI(model_name=self.model), chain_type="stuff", retriever=self.db.as_retriever())
+        self.qa = RetrievalQA.from_chain_type(
+            llm=ChatOpenAI(model_name=self.model),
+            chain_type="stuff",
+            retriever=self.db.as_retriever(),
+            chain_type_kwargs={"prompt": PromptTemplate(template=self.prompt, input_variables=["context", "question"])}
+        )
         self.kanu.container.pack_forget()
         self.kanu.container = tk.Frame(self.kanu.root)
         self.kanu.container.pack()

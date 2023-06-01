@@ -4,6 +4,13 @@ import importlib.util
 from .version import __version__
 from .utils import Tooltip
 
+DOCGPT_PROMPT = """Use the following pieces of context to answer the question at the end. If you don't know the answer, just say that you don't know, don't try to make up an answer.
+
+{context}
+
+Question: {question}
+Helpful Answer:"""
+
 class KANU:
     def __init__(self, root):
         self.container = None
@@ -84,14 +91,23 @@ class KANU:
         b.grid(row=10, column=0)
         b = tk.Radiobutton(self.container, variable=self.model, text="gpt-4", value="gpt-4")
         b.grid(row=10, column=1)
+        l = tk.Label(self.container, text="System message ⓘ:")
+        Tooltip(l, "The system message helps set the behavior of the chatbot.")
+        l.grid(row=11, column=0, columnspan=3)
+        self.prompt = tk.Text(self.container, height=9, width=42)
+        sb = tk.Scrollbar(self.container, command=self.prompt.yview)
+        self.prompt.insert("1.0", DOCGPT_PROMPT)
+        self.prompt.grid(row=12, column=0, columnspan=3, sticky="nsew")
+        sb.grid(row=12, column=3, sticky="ns")
+        self.prompt["yscrollcommand"] = sb.set
         l = tk.Label(self.container, text="OpenAI API key:")
-        l.grid(row=11, column=0, columnspan=2)
+        l.grid(row=13, column=0, columnspan=2)
         e = tk.Entry(self.container)
-        e.grid(row=12, column=0, columnspan=2)
-        b = tk.Button(self.container, text="Submit", command=lambda: self.deploy_agent("DocGPT", e.get(), self.model.get()))
-        b.grid(row=13, column=0)
+        e.grid(row=14, column=0, columnspan=2)
+        b = tk.Button(self.container, text="Submit", command=lambda: self.deploy_agent("DocGPT", e.get(), self.model.get(), self.prompt.get("1.0", "end-1c")))
+        b.grid(row=15, column=0)
         b = tk.Button(self.container, text="Go back", command=lambda: self.homepage())
-        b.grid(row=13, column=1)
+        b.grid(row=15, column=1)
 
     def deploy_agent(self, agent, *args, **kwargs):
         if agent == "ChatGPT":
