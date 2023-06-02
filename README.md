@@ -1,5 +1,7 @@
 # README
 
+[![PyPI](https://badge.fury.io/py/kanu.svg)](https://badge.fury.io/py/kanu)
+
 KANU is a minimalistic Python-based GUI for various chatbots.
 
 ## Chatbots
@@ -26,4 +28,4 @@ $ kanu
 
 ## Changelog
 
-See the [CHANGELOG.md](./CHANGELOG.md) file for details.
+See the [CHANGELOG.md](https://github.com/sbslee/kanu/blob/main/CHANGELOG.md) file for details.

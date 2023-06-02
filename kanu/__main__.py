@@ -4,12 +4,20 @@ import importlib.util
 from .version import __version__
 from .utils import Tooltip
 
+CHATGPT_PROMPT = """You are a helpful assistant."""
+DOCGPT_PROMPT = """Use the following pieces of context to answer the question at the end. If you don't know the answer, just say that you don't know, don't try to make up an answer.
+
+{context}
+
+Question: {question}
+Helpful Answer:"""
+
 class KANU:
     def __init__(self, root):
         self.container = None
         self.root = root
         self.root.title(f"KANU ({__version__})")
-        self.root.geometry("600x400")
+        self.root.geometry("600x500")
         self.homepage()
 
     def homepage(self):
@@ -40,14 +48,29 @@ class KANU:
         b.grid(row=4, column=0)
         b = tk.Radiobutton(self.container, variable=self.model, text="gpt-4", value="gpt-4")
         b.grid(row=4, column=1)
-        l = tk.Label(self.container, text="OpenAI API key:")
+        l = tk.Label(self.container, text="System message ⓘ:")
+        Tooltip(l, "The system message helps set the behavior of the chatbot.")
         l.grid(row=5, column=0, columnspan=2)
+        self.prompt = tk.Text(self.container, height=9, width=42)
+        sb = tk.Scrollbar(self.container, command=self.prompt.yview)
+        self.prompt.insert("1.0", CHATGPT_PROMPT)
+        self.prompt.grid(row=6, column=0, columnspan=2, sticky="nsew")
+        sb.grid(row=6, column=2, sticky="ns")
+        self.prompt["yscrollcommand"] = sb.set
+        l = tk.Label(self.container, text="Temperature ⓘ:")
+        Tooltip(l, "The randomness in generating responses, which ranges between 0 and 1, with 0 indicating almost deterministic behavior.")
+        l.grid(row=7, column=0, columnspan=2)
+        self.temperature = tk.DoubleVar(self.container, value=0.5)
+        e = tk.Entry(self.container, textvariable=self.temperature)
+        e.grid(row=8, column=0, columnspan=2)
+        l = tk.Label(self.container, text="OpenAI API key:")
+        l.grid(row=9, column=0, columnspan=2)
         e = tk.Entry(self.container)
-        e.grid(row=6, column=0, columnspan=2)
-        b = tk.Button(self.container, text="Submit", command=lambda: self.deploy_agent("ChatGPT", e.get(), self.model.get()))
-        b.grid(row=7, column=0)
+        e.grid(row=10, column=0, columnspan=2)
+        b = tk.Button(self.container, text="Submit", command=lambda: self.deploy_agent("ChatGPT", e.get(), self.model.get(), self.temperature.get(), self.prompt.get("1.0", "end-1c")))
+        b.grid(row=11, column=0)
         b = tk.Button(self.container, text="Go back", command=lambda: self.homepage())
-        b.grid(row=7, column=1)
+        b.grid(row=11, column=1)
 
     def config_docgpt(self):
         self.container.pack_forget()
@@ -68,18 +91,27 @@ class KANU:
         self.model = tk.StringVar(self.container, value="gpt-3.5-turbo")
         l = tk.Label(self.container, text="Model:")
         l.grid(row=9, column=0, columnspan=2)
-        b = tk.Radiobutton(self.container, variable=self.model, text="gpt-3.5-turbo", value="gpt-3.5-turbo")
-        b.grid(row=10, column=0)
-        b = tk.Radiobutton(self.container, variable=self.model, text="gpt-4", value="gpt-4")
-        b.grid(row=10, column=1)
+        rb = tk.Radiobutton(self.container, variable=self.model, text="gpt-3.5-turbo", value="gpt-3.5-turbo")
+        rb.grid(row=10, column=0)
+        rb = tk.Radiobutton(self.container, variable=self.model, text="gpt-4", value="gpt-4")
+        rb.grid(row=10, column=1)
+        l = tk.Label(self.container, text="System message ⓘ:")
+        Tooltip(l, "The system message helps set the behavior of the chatbot.")
+        l.grid(row=11, column=0, columnspan=3)
+        self.prompt = tk.Text(self.container, height=9, width=42)
+        sb = tk.Scrollbar(self.container, command=self.prompt.yview)
+        self.prompt.insert("1.0", DOCGPT_PROMPT)
+        self.prompt.grid(row=12, column=0, columnspan=3, sticky="nsew")
+        sb.grid(row=12, column=3, sticky="ns")
+        self.prompt["yscrollcommand"] = sb.set
         l = tk.Label(self.container, text="OpenAI API key:")
-        l.grid(row=11, column=0, columnspan=2)
+        l.grid(row=13, column=0, columnspan=2)
         e = tk.Entry(self.container)
-        e.grid(row=12, column=0, columnspan=2)
-        b = tk.Button(self.container, text="Submit", command=lambda: self.deploy_agent("DocGPT", e.get(), self.model.get()))
-        b.grid(row=13, column=0)
+        e.grid(row=14, column=0, columnspan=2)
+        b = tk.Button(self.container, text="Submit", command=lambda: self.deploy_agent("DocGPT", e.get(), self.model.get(), self.prompt.get("1.0", "end-1c")))
+        b.grid(row=15, column=0)
         b = tk.Button(self.container, text="Go back", command=lambda: self.homepage())
-        b.grid(row=13, column=1)
+        b.grid(row=15, column=1)
 
     def deploy_agent(self, agent, *args, **kwargs):
         if agent == "ChatGPT":
