@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 0.4.0 (in development)
+## 0.4.0 (2023-06-02)
 * Allow users to modify chatbot parameters (e.g. prompt, temperature, and chunk size).
 
 ## 0.3.0 (2023-05-30)
