@@ -6,8 +6,9 @@ from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import Chroma
 from langchain.chat_models import ChatOpenAI
-from langchain.chains import RetrievalQA
+from langchain.chains import ConversationalRetrievalChain
 from langchain.prompts import PromptTemplate
+from langchain.memory import ConversationBufferMemory
 
 from langchain.document_loaders import (
     TextLoader,
@@ -85,12 +86,14 @@ class DocGPT:
         self.option2_button["state"] = tk.DISABLED
 
     def query(self):
+        self.memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
         self.db = Chroma(persist_directory=self.database_directory, embedding_function=OpenAIEmbeddings())
-        self.qa = RetrievalQA.from_chain_type(
+        self.qa = ConversationalRetrievalChain.from_llm(
             llm=ChatOpenAI(model_name=self.model),
-            chain_type="stuff",
             retriever=self.db.as_retriever(),
-            chain_type_kwargs={"prompt": PromptTemplate(template=self.prompt, input_variables=["context", "question"])}
+            memory=self.memory,
+            chain_type="stuff",
+            combine_docs_chain_kwargs={"prompt": PromptTemplate(template=self.prompt, input_variables=["context", "question"])}
         )
         self.kanu.container.pack_forget()
         self.kanu.container = tk.Frame(self.kanu.root)
@@ -110,7 +113,7 @@ class DocGPT:
 
     def send_message(self, entry):
         self.session.insert(tk.END, "You: " + entry.get() + "\n")
-        response = self.qa(entry.get())["result"]
+        response = self.qa(entry.get())["answer"]
         self.session.insert(tk.END, "Bot: " + response + "\n")
         entry.delete(0, tk.END)
 
