@@ -1,7 +1,7 @@
 # CHANGELOG
 
 ## 0.4.0 (in development)
-* Allow users to modify chatbot parameters (e.g. prompt, temperature, chunk size).
+* Allow users to modify chatbot parameters (e.g. prompt, temperature, and chunk size).
 
 ## 0.3.0 (2023-05-30)
 * Add multi-document chat functionality.
