@@ -25,10 +25,11 @@ DOCUMENT_LOADERS = {
     ".docx": UnstructuredWordDocumentLoader,
 }
 class DocGPT:
-    def __init__(self, kanu, openai_key, model, prompt):
+    def __init__(self, kanu, openai_key, model, prompt, temperature):
         self.kanu = kanu
         self.model = model
         self.prompt = prompt
+        self.temperature = temperature
         os.environ["OPENAI_API_KEY"] = openai_key
 
     def run(self):
@@ -89,7 +90,7 @@ class DocGPT:
         self.memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
         self.db = Chroma(persist_directory=self.database_directory, embedding_function=OpenAIEmbeddings())
         self.qa = ConversationalRetrievalChain.from_llm(
-            llm=ChatOpenAI(model_name=self.model),
+            llm=ChatOpenAI(model_name=self.model, temperature=self.temperature),
             retriever=self.db.as_retriever(),
             memory=self.memory,
             chain_type="stuff",
