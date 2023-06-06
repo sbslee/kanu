@@ -1,7 +1,7 @@
 # CHANGELOG
 
 ## 0.5.0 (in development)
-* Implement chat history feature for follow-up questions in DocGPT.
+* Enable users to ask follow-up questions when chatting with documents.
 
 ## 0.4.0 (2023-06-02)
 * Allow users to modify chatbot parameters (e.g. prompt, temperature, and chunk size).
