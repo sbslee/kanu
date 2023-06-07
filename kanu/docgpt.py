@@ -19,11 +19,12 @@ from langchain.document_loaders import (
 from .utils import Tooltip
 
 DOCUMENT_LOADERS = {
-    ".txt": TextLoader,
-    ".pdf": PDFMinerLoader,
-    ".doc": UnstructuredWordDocumentLoader,
-    ".docx": UnstructuredWordDocumentLoader,
+    ".txt": (TextLoader, {"encoding": "utf8"}),
+    ".pdf": (PDFMinerLoader, {}),
+    ".doc": (UnstructuredWordDocumentLoader, {}),
+    ".docx": (UnstructuredWordDocumentLoader, {}),
 }
+
 class DocGPT:
     def __init__(self, kanu, openai_key, model, prompt, temperature):
         self.kanu = kanu
@@ -126,7 +127,8 @@ class DocGPT:
                 file_ext = os.path.splitext(file_path)[1]
                 if file_ext not in DOCUMENT_LOADERS:
                     continue
-                loader = DOCUMENT_LOADERS[file_ext](file_path)
+                loader_class, loader_kwargs = DOCUMENT_LOADERS[file_ext]
+                loader = loader_class(file_path, **loader_kwargs)
                 document = loader.load()[0]
                 documents.append(document)
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=self.chunk_size.get(), chunk_overlap=self.chunk_overlap.get())
