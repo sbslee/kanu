@@ -1,6 +1,7 @@
 # CHANGELOG
 
 ## 0.6.0 (in development)
+* Enable users to chat with .csv documents.
 
 ## 0.5.0 (2023-06-08)
 * Enable users to ask follow-up questions when chatting with documents.

@@ -13,7 +13,8 @@ from langchain.memory import ConversationBufferMemory
 from langchain.document_loaders import (
     TextLoader,
     PDFMinerLoader,
-    UnstructuredWordDocumentLoader
+    UnstructuredWordDocumentLoader,
+    CSVLoader,
 )
 
 from .utils import Tooltip
@@ -23,6 +24,7 @@ DOCUMENT_LOADERS = {
     ".pdf": (PDFMinerLoader, {}),
     ".doc": (UnstructuredWordDocumentLoader, {}),
     ".docx": (UnstructuredWordDocumentLoader, {}),
+    ".csv": (CSVLoader, {}),
 }
 
 class DocGPT:
@@ -129,12 +131,12 @@ class DocGPT:
                     continue
                 loader_class, loader_kwargs = DOCUMENT_LOADERS[file_ext]
                 loader = loader_class(file_path, **loader_kwargs)
-                document = loader.load()[0]
-                documents.append(document)
+                document = loader.load()
+                documents.extend(document)
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=self.chunk_size.get(), chunk_overlap=self.chunk_overlap.get())
         texts = text_splitter.split_documents(documents)
         db = Chroma.from_documents(texts, OpenAIEmbeddings(), persist_directory=self.database_directory)
-        db.add_documents(texts)    
+        db.add_documents(texts)
         db.persist()
         db = None
         self.query()
