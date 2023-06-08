@@ -26,11 +26,11 @@ DOCUMENT_LOADERS = {
 }
 
 class DocGPT:
-    def __init__(self, kanu, openai_key, model, prompt, temperature):
+    def __init__(self, kanu, openai_key, model, temperature, prompt):
         self.kanu = kanu
         self.model = model
-        self.prompt = prompt
         self.temperature = temperature
+        self.prompt = prompt
         os.environ["OPENAI_API_KEY"] = openai_key
 
     def run(self):

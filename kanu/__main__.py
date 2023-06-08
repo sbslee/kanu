@@ -19,7 +19,7 @@ class KANU:
         self.container = None
         self.root = root
         self.root.title(f"KANU ({__version__})")
-        self.root.geometry("600x600")
+        self.root.geometry("600x620")
         self.homepage()
 
     def homepage(self):
@@ -110,36 +110,56 @@ class KANU:
         self.display_optional_dependency(6, "pdfminer.six", "pdfminer", "Required for .pdf documents.")
         self.display_optional_dependency(7, "unstructured", "unstructured", "Required for .doc and .docx documents.")
         self.display_optional_dependency(8, "tabulate", "tabulate", "Required for .doc and .docx documents.")
+        m = tk.Message(self.container, width=300, text="Option 1. Upload a configuration file")
+        m.grid(row=9, column=0, columnspan=2)
+        b = tk.Button(self.container, text="Browse", command=self.parse_docgpt_config)
+        b.grid(row=10, column=0)
+        b = tk.Button(self.container, text="Template", command=self.template_docgpt_config)
+        b.grid(row=10, column=1)
+        m = tk.Message(self.container, width=300, text="Option 2. Configure manually")
+        m.grid(row=11, column=0, columnspan=2)
         self.model = tk.StringVar(self.container, value="gpt-3.5-turbo")
         l = tk.Label(self.container, text="Model:")
-        l.grid(row=9, column=0, columnspan=2)
+        l.grid(row=12, column=0, columnspan=2)
         rb = tk.Radiobutton(self.container, variable=self.model, text="gpt-3.5-turbo", value="gpt-3.5-turbo")
-        rb.grid(row=10, column=0)
+        rb.grid(row=13, column=0)
         rb = tk.Radiobutton(self.container, variable=self.model, text="gpt-4", value="gpt-4")
-        rb.grid(row=10, column=1)
+        rb.grid(row=13, column=1)
         l = tk.Label(self.container, text="System message ⓘ:")
         Tooltip(l, "The system message helps set the behavior of the chatbot.")
-        l.grid(row=11, column=0, columnspan=2)
+        l.grid(row=14, column=0, columnspan=2)
         self.prompt = tk.Text(self.container, height=9, width=42)
         sb = tk.Scrollbar(self.container, command=self.prompt.yview)
         self.prompt.insert("1.0", DOCGPT_PROMPT)
-        self.prompt.grid(row=12, column=0, columnspan=2, sticky="nsew")
-        sb.grid(row=12, column=2, sticky="ns")
+        self.prompt.grid(row=15, column=0, columnspan=2, sticky="nsew")
+        sb.grid(row=15, column=2, sticky="ns")
         self.prompt["yscrollcommand"] = sb.set
         l = tk.Label(self.container, text="Temperature ⓘ:")
         Tooltip(l, "The randomness in generating responses, which ranges between 0 and 1, with 0 indicating almost deterministic behavior.")
-        l.grid(row=13, column=0, columnspan=2)
+        l.grid(row=16, column=0, columnspan=2)
         self.temperature = tk.DoubleVar(self.container, value=0.5)
         e = tk.Entry(self.container, textvariable=self.temperature)
-        e.grid(row=14, column=0, columnspan=2)
+        e.grid(row=17, column=0, columnspan=2)
         l = tk.Label(self.container, text="OpenAI API key:")
-        l.grid(row=15, column=0, columnspan=2)
+        l.grid(row=18, column=0, columnspan=2)
         e = tk.Entry(self.container)
-        e.grid(row=16, column=0, columnspan=2)
+        e.grid(row=19, column=0, columnspan=2)
         b = tk.Button(self.container, text="Submit", command=lambda: self.deploy_agent("DocGPT", e.get(), self.model.get(), self.prompt.get("1.0", "end-1c"), self.temperature.get()))
-        b.grid(row=17, column=0)
+        b.grid(row=20, column=0)
         b = tk.Button(self.container, text="Go back", command=lambda: self.homepage())
-        b.grid(row=17, column=1)
+        b.grid(row=20, column=1)
+
+    def parse_docgpt_config(self):
+        config = configparser.ConfigParser()
+        config.read(filedialog.askopenfilename())
+        self.deploy_agent("DocGPT", config["USER"]["openai_key"], config["DEFAULT"]["model"], float(config["DEFAULT"]["temperature"]), config["DEFAULT"]["prompt"])
+
+    def template_docgpt_config(self):
+        config = configparser.ConfigParser()
+        config["DEFAULT"] = {"model": "gpt-3.5-turbo", "temperature": "0.5", "prompt": DOCGPT_PROMPT}
+        config["USER"] = {"openai_key": ""}
+        with open(filedialog.asksaveasfilename(), "w") as f:
+            config.write(f)
 
     def deploy_agent(self, agent, *args, **kwargs):
         if agent == "ChatGPT":
