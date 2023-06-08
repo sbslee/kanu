@@ -2,6 +2,7 @@
 
 ## 0.5.0 (in development)
 * Enable users to ask follow-up questions when chatting with documents.
+* Enable users to customize chatbot parameters by uploading a configuration file.
 
 ## 0.4.0 (2023-06-02)
 * Allow users to modify chatbot parameters (e.g. prompt, temperature, and chunk size).

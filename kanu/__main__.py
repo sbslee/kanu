@@ -1,4 +1,6 @@
+import configparser
 import tkinter as tk
+from tkinter import filedialog
 import importlib.util
 
 from .version import __version__
@@ -41,36 +43,56 @@ class KANU:
         l = tk.Label(self.container, text="Required packages:")
         l.grid(row=1, column=0, columnspan=2)
         self.display_required_dependency(2, "openai")
+        m = tk.Message(self.container, width=300, text="Option 1. Upload a configuration file")
+        m.grid(row=3, column=0, columnspan=2)
+        b = tk.Button(self.container, text="Browse", command=self.parse_chatgpt_config)
+        b.grid(row=4, column=0)
+        b = tk.Button(self.container, text="Template", command=self.template_chatgpt_config)
+        b.grid(row=4, column=1)
+        m = tk.Message(self.container, width=300, text="Option 2. Configure manually")
+        m.grid(row=5, column=0, columnspan=2)
         self.model = tk.StringVar(self.container, value="gpt-3.5-turbo")
         l = tk.Label(self.container, text="Model:")
-        l.grid(row=3, column=0, columnspan=2)
+        l.grid(row=6, column=0, columnspan=2)
         b = tk.Radiobutton(self.container, variable=self.model, text="gpt-3.5-turbo", value="gpt-3.5-turbo")
-        b.grid(row=4, column=0)
+        b.grid(row=7, column=0)
         b = tk.Radiobutton(self.container, variable=self.model, text="gpt-4", value="gpt-4")
-        b.grid(row=4, column=1)
+        b.grid(row=7, column=1)
         l = tk.Label(self.container, text="System message ⓘ:")
         Tooltip(l, "The system message helps set the behavior of the chatbot.")
-        l.grid(row=5, column=0, columnspan=2)
+        l.grid(row=8, column=0, columnspan=2)
         self.prompt = tk.Text(self.container, height=9, width=42)
         sb = tk.Scrollbar(self.container, command=self.prompt.yview)
         self.prompt.insert("1.0", CHATGPT_PROMPT)
-        self.prompt.grid(row=6, column=0, columnspan=2, sticky="nsew")
-        sb.grid(row=6, column=2, sticky="ns")
+        self.prompt.grid(row=9, column=0, columnspan=2, sticky="nsew")
+        sb.grid(row=9, column=2, sticky="ns")
         self.prompt["yscrollcommand"] = sb.set
         l = tk.Label(self.container, text="Temperature ⓘ:")
         Tooltip(l, "The randomness in generating responses, which ranges between 0 and 1, with 0 indicating almost deterministic behavior.")
-        l.grid(row=7, column=0, columnspan=2)
+        l.grid(row=10, column=0, columnspan=2)
         self.temperature = tk.DoubleVar(self.container, value=0.5)
         e = tk.Entry(self.container, textvariable=self.temperature)
-        e.grid(row=8, column=0, columnspan=2)
+        e.grid(row=11, column=0, columnspan=2)
         l = tk.Label(self.container, text="OpenAI API key:")
-        l.grid(row=9, column=0, columnspan=2)
+        l.grid(row=12, column=0, columnspan=2)
         e = tk.Entry(self.container)
-        e.grid(row=10, column=0, columnspan=2)
+        e.grid(row=13, column=0, columnspan=2)
         b = tk.Button(self.container, text="Submit", command=lambda: self.deploy_agent("ChatGPT", e.get(), self.model.get(), self.temperature.get(), self.prompt.get("1.0", "end-1c")))
-        b.grid(row=11, column=0)
+        b.grid(row=14, column=0)
         b = tk.Button(self.container, text="Go back", command=lambda: self.homepage())
-        b.grid(row=11, column=1)
+        b.grid(row=14, column=1)
+
+    def parse_chatgpt_config(self):
+        config = configparser.ConfigParser()
+        config.read(filedialog.askopenfilename())
+        self.deploy_agent("ChatGPT", config["USER"]["openai_key"], config["DEFAULT"]["model"], float(config["DEFAULT"]["temperature"]), config["DEFAULT"]["prompt"])
+
+    def template_chatgpt_config(self):
+        config = configparser.ConfigParser()
+        config["DEFAULT"] = {"model": "gpt-3.5-turbo", "temperature": "0.5", "prompt": CHATGPT_PROMPT}
+        config["USER"] = {"openai_key": ""}
+        with open(filedialog.asksaveasfilename(), "w") as f:
+            config.write(f)
 
     def config_docgpt(self):
         self.container.pack_forget()
