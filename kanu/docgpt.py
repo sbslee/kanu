@@ -6,8 +6,9 @@ from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import Chroma
 from langchain.chat_models import ChatOpenAI
-from langchain.chains import RetrievalQA
+from langchain.chains import ConversationalRetrievalChain
 from langchain.prompts import PromptTemplate
+from langchain.memory import ConversationBufferMemory
 
 from langchain.document_loaders import (
     TextLoader,
@@ -18,15 +19,17 @@ from langchain.document_loaders import (
 from .utils import Tooltip
 
 DOCUMENT_LOADERS = {
-    ".txt": TextLoader,
-    ".pdf": PDFMinerLoader,
-    ".doc": UnstructuredWordDocumentLoader,
-    ".docx": UnstructuredWordDocumentLoader,
+    ".txt": (TextLoader, {"encoding": "utf8"}),
+    ".pdf": (PDFMinerLoader, {}),
+    ".doc": (UnstructuredWordDocumentLoader, {}),
+    ".docx": (UnstructuredWordDocumentLoader, {}),
 }
+
 class DocGPT:
-    def __init__(self, kanu, openai_key, model, prompt):
+    def __init__(self, kanu, openai_key, model, temperature, prompt):
         self.kanu = kanu
         self.model = model
+        self.temperature = temperature
         self.prompt = prompt
         os.environ["OPENAI_API_KEY"] = openai_key
 
@@ -85,12 +88,14 @@ class DocGPT:
         self.option2_button["state"] = tk.DISABLED
 
     def query(self):
+        self.memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
         self.db = Chroma(persist_directory=self.database_directory, embedding_function=OpenAIEmbeddings())
-        self.qa = RetrievalQA.from_chain_type(
-            llm=ChatOpenAI(model_name=self.model),
-            chain_type="stuff",
+        self.qa = ConversationalRetrievalChain.from_llm(
+            llm=ChatOpenAI(model_name=self.model, temperature=self.temperature),
             retriever=self.db.as_retriever(),
-            chain_type_kwargs={"prompt": PromptTemplate(template=self.prompt, input_variables=["context", "question"])}
+            memory=self.memory,
+            chain_type="stuff",
+            combine_docs_chain_kwargs={"prompt": PromptTemplate(template=self.prompt, input_variables=["context", "question"])}
         )
         self.kanu.container.pack_forget()
         self.kanu.container = tk.Frame(self.kanu.root)
@@ -110,7 +115,7 @@ class DocGPT:
 
     def send_message(self, entry):
         self.session.insert(tk.END, "You: " + entry.get() + "\n")
-        response = self.qa(entry.get())["result"]
+        response = self.qa(entry.get())["answer"]
         self.session.insert(tk.END, "Bot: " + response + "\n")
         entry.delete(0, tk.END)
 
@@ -122,7 +127,8 @@ class DocGPT:
                 file_ext = os.path.splitext(file_path)[1]
                 if file_ext not in DOCUMENT_LOADERS:
                     continue
-                loader = DOCUMENT_LOADERS[file_ext](file_path)
+                loader_class, loader_kwargs = DOCUMENT_LOADERS[file_ext]
+                loader = loader_class(file_path, **loader_kwargs)
                 document = loader.load()[0]
                 documents.append(document)
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=self.chunk_size.get(), chunk_overlap=self.chunk_overlap.get())
