@@ -5,11 +5,11 @@ class Settings:
     def __init__(self, agent):
         default = font.nametofont("TkDefaultFont").actual()
         self.agent = agent
-        self.user_background_color = tk.StringVar(self.agent.kanu.container, value="cyan")
+        self.user_background_color = tk.StringVar(self.agent.kanu.container, value="gray85")
         self.user_foreground_color = tk.StringVar(self.agent.kanu.container, value="black")
         self.user_font_family = tk.StringVar(self.agent.kanu.container, value=default["family"])
         self.user_font_size = tk.IntVar(self.agent.kanu.container, value=default["size"])
-        self.bot_background_color = tk.StringVar(self.agent.kanu.container, value="pink")
+        self.bot_background_color = tk.StringVar(self.agent.kanu.container, value="white")
         self.bot_foreground_color = tk.StringVar(self.agent.kanu.container, value="black")
         self.bot_font_family = tk.StringVar(self.agent.kanu.container, value=default["family"])
         self.bot_font_size = tk.IntVar(self.agent.kanu.container, value=default["size"])
@@ -33,7 +33,7 @@ class Settings:
         self.agent.kanu.container.pack_forget()
         self.agent.kanu.container = tk.Frame(self.agent.kanu.root)
         self.agent.kanu.container.pack()
-        l = tk.Label(self.agent.kanu.container, text=self.agent.name)
+        l = tk.Label(self.agent.kanu.container, text=self.agent.__class__.__name__)
         l.grid(row=0, column=0, columnspan=2)
         l = tk.Label(self.agent.kanu.container, text="User background color")
         l.grid(row=1, column=0)

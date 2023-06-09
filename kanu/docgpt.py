@@ -29,7 +29,6 @@ DOCUMENT_LOADERS = {
 
 class DocGPT:
     def __init__(self, kanu, openai_key, model, temperature, prompt):
-        self.name = "DocGPT"
         self.kanu = kanu
         self.model = model
         self.temperature = temperature
@@ -108,8 +107,8 @@ class DocGPT:
         l.grid(row=0, column=0, columnspan=4)    
         self.session = tk.Text(self.kanu.container, width=70, height=20)
         self.session.grid(row=1, column=0, columnspan=4)
-        self.session.tag_config("user", background=self.settings.user_background_color.get(), foreground=self.settings.user_foreground_color.get())
-        self.session.tag_config("bot", background=self.settings.bot_background_color.get(), foreground=self.settings.user_foreground_color.get())
+        self.session.tag_config("user", **self.settings.get_user_kwargs())
+        self.session.tag_config("bot", **self.settings.get_bot_kwargs())
         user_input = tk.Entry(self.kanu.container, width=54)
         user_input.grid(row=2, column=0, columnspan=4)
         b = tk.Button(self.kanu.container, text="Send", command=lambda: self.send_message(user_input))

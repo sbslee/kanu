@@ -6,7 +6,6 @@ from .utils import Settings
 
 class ChatGPT:
     def __init__(self, kanu, openai_key, model, temperature, prompt):
-        self.name = "ChatGPT"
         self.kanu = kanu
         self.model = model
         self.temperature = temperature
