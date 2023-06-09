@@ -2,8 +2,9 @@
 
 [![PyPI](https://badge.fury.io/py/kanu.svg)](https://badge.fury.io/py/kanu)
 
-KANU is a minimalistic Python-based GUI for various chatbots.
+Welcome to KANU, a minimalistic Python-based GUI for various chatbots.
 
+<a id="chatbots"></a>
 ## Chatbots
 
 ### ChatGPT
@@ -16,9 +17,13 @@ KANU is a minimalistic Python-based GUI for various chatbots.
 
 ## Installation
 
+The recommended way is via pip:
+
 ```
 $ pip install kanu
 ```
+
+However, please note that KANU requires a different set of dependencies for each chatbot. You can find the dependencies specific to each chatbot in the [Chatbots](#chatbots) section.
 
 ## Running
 
