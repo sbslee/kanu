@@ -6,8 +6,8 @@ Welcome to KANU, a minimalistic Python-based GUI for various chatbots.
 
 There are currently two chatbots available in KANU:
 
-- [ChatGPT](#chatgpt): This chatbot harnesses the power of ChatGPT, bringing it directly to your local computer.
-- [DocGPT](#docgpt): This chatbot enables seamless interaction with your documents. Ask questions about your documents and receive answers in real-time.
+- [ChatGPT](#chatgpt) harnesses the power of ChatGPT, bringing it directly to your local computer
+- [DocGPT](#docgpt) allows you to effortlessly interact with your documents and ask questions about them
 
 Other features of KANU inclde:
 
