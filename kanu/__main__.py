@@ -150,7 +150,7 @@ class KANU:
         l.grid(row=18, column=0, columnspan=2)
         e = tk.Entry(self.container)
         e.grid(row=19, column=0, columnspan=2)
-        b = tk.Button(self.container, text="Submit", command=lambda: self.deploy_agent("DocGPT", e.get(), self.model.get(), self.prompt.get("1.0", "end-1c"), self.temperature.get()))
+        b = tk.Button(self.container, text="Submit", command=lambda: self.deploy_agent("DocGPT", e.get(), self.model.get(), self.prompt.get("1.0", "end-1c"), self.temperature.get(), 1000, 50))
         b.grid(row=20, column=0)
         b = tk.Button(self.container, text="Go back", command=lambda: self.homepage())
         b.grid(row=20, column=1)
@@ -161,14 +161,14 @@ class KANU:
         if not file_path:
             return
         config.read(file_path)
-        self.deploy_agent("DocGPT", config["USER"]["openai_key"], config["DEFAULT"]["model"], float(config["DEFAULT"]["temperature"]), config["DEFAULT"]["prompt"])
+        self.deploy_agent("DocGPT", config["USER"]["openai_key"], config["DEFAULT"]["model"], float(config["DEFAULT"]["temperature"]), config["DEFAULT"]["prompt"], config["DEFAULT"]["chunk_size"], config["DEFAULT"]["chunk_overlap"])
 
     def template_docgpt_config(self):
         file_path = filedialog.asksaveasfilename()
         if not file_path:
             return
         config = configparser.ConfigParser()
-        config["DEFAULT"] = {"model": "gpt-3.5-turbo", "temperature": "0.5", "prompt": DOCGPT_PROMPT}
+        config["DEFAULT"] = {"model": "gpt-3.5-turbo", "temperature": "0.5", "prompt": DOCGPT_PROMPT, "chunk_size": 1000, "chunk_overlap": 50}
         config["USER"] = {"openai_key": ""}
         with open(file_path, "w") as f:
             config.write(f)

@@ -28,11 +28,13 @@ DOCUMENT_LOADERS = {
 }
 
 class DocGPT:
-    def __init__(self, kanu, openai_key, model, temperature, prompt):
+    def __init__(self, kanu, openai_key, model, temperature, prompt, default_chunk_size, default_chunk_overlap):
         self.kanu = kanu
         self.model = model
         self.temperature = temperature
         self.prompt = prompt
+        self.default_chunk_size = default_chunk_size
+        self.default_chunk_overlap = default_chunk_overlap
         os.environ["OPENAI_API_KEY"] = openai_key
         self.settings = Settings(self)
 
@@ -65,13 +67,13 @@ class DocGPT:
         l = tk.Label(self.kanu.container, text="Chunk size ⓘ:")
         Tooltip(l, "The maximum number of characters in each chunk.")
         l.grid(row=5, column=0)
-        self.chunk_size = tk.IntVar(self.kanu.container, value=1000)
+        self.chunk_size = tk.IntVar(self.kanu.container, value=self.default_chunk_size)
         e = tk.Entry(self.kanu.container, textvariable=self.chunk_size)
         e.grid(row=5, column=1, columnspan=2)
         l = tk.Label(self.kanu.container, text="Chunk overlap ⓘ:")
         Tooltip(l, "The number of overlapping characters between adjacent chunks.")
         l.grid(row=6, column=0)
-        self.chunk_overlap = tk.IntVar(self.kanu.container, value=50)
+        self.chunk_overlap = tk.IntVar(self.kanu.container, value=self.default_chunk_overlap)
         e = tk.Entry(self.kanu.container, textvariable=self.chunk_overlap)
         e.grid(row=6, column=1, columnspan=2)
         self.option1_button = tk.Button(self.kanu.container, text="Go with Option 1", command=self.go_with_option1)
