@@ -84,14 +84,20 @@ class KANU:
 
     def parse_chatgpt_config(self):
         config = configparser.ConfigParser()
-        config.read(filedialog.askopenfilename())
+        file_path = filedialog.askopenfilename()
+        if not file_path:
+            return
+        config.read(file_path)
         self.deploy_agent("ChatGPT", config["USER"]["openai_key"], config["DEFAULT"]["model"], float(config["DEFAULT"]["temperature"]), config["DEFAULT"]["prompt"])
 
     def template_chatgpt_config(self):
+        file_path = filedialog.asksaveasfilename()
+        if not file_path:
+            return
         config = configparser.ConfigParser()
         config["DEFAULT"] = {"model": "gpt-3.5-turbo", "temperature": "0.5", "prompt": CHATGPT_PROMPT}
         config["USER"] = {"openai_key": ""}
-        with open(filedialog.asksaveasfilename(), "w") as f:
+        with open(file_path, "w") as f:
             config.write(f)
 
     def config_docgpt(self):
@@ -151,14 +157,20 @@ class KANU:
 
     def parse_docgpt_config(self):
         config = configparser.ConfigParser()
-        config.read(filedialog.askopenfilename())
+        file_path = filedialog.askopenfilename()
+        if not file_path:
+            return
+        config.read(file_path)
         self.deploy_agent("DocGPT", config["USER"]["openai_key"], config["DEFAULT"]["model"], float(config["DEFAULT"]["temperature"]), config["DEFAULT"]["prompt"])
 
     def template_docgpt_config(self):
+        file_path = filedialog.asksaveasfilename()
+        if not file_path:
+            return
         config = configparser.ConfigParser()
         config["DEFAULT"] = {"model": "gpt-3.5-turbo", "temperature": "0.5", "prompt": DOCGPT_PROMPT}
         config["USER"] = {"openai_key": ""}
-        with open(filedialog.asksaveasfilename(), "w") as f:
+        with open(file_path, "w") as f:
             config.write(f)
 
     def deploy_agent(self, agent, *args, **kwargs):
