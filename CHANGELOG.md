@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 0.6.0 (in development)
+## 0.6.0 (2023-06-12)
 * Enable users to chat with .csv documents.
 * Enable users to customize chat settings (e.g. font size and background color).
 
