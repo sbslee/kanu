@@ -1,6 +1,29 @@
 import tkinter as tk
 from tkinter import font
 
+import tiktoken
+
+class Tokenizer:
+    # https://openai.com/pricing#language-models
+    PRICES = {"gpt-3.5-turbo": 0.002/1000, "gpt-4": 0.03/1000}
+
+    def __init__(self, model):
+        self.total = 0
+        self.tokens = []
+        self.model = model
+        self.encoding = tiktoken.encoding_for_model(model)
+
+    def add(self, text):
+        token = len(self.encoding.encode(text))
+        self.total += token
+        self.tokens.append(token)
+    
+    def cost(self):
+        return self.total * self.PRICES[self.model]
+    
+    def dollars(self):
+        return [x * self.PRICES[self.model] for x in self.tokens]
+
 class Settings:
     def __init__(self, agent):
         self.default_font = font.nametofont("TkDefaultFont").actual()

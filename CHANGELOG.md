@@ -1,6 +1,7 @@
 # CHANGELOG
 
 ## 0.7.0 (in development)
+* Implement token counter and price monitor in chat window.
 
 ## 0.6.0 (2023-06-12)
 * Enable users to chat with .csv documents.

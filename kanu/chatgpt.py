@@ -2,7 +2,7 @@ import tkinter as tk
 
 import openai
 
-from .utils import Settings
+from .utils import Settings, Tokenizer
 
 class ChatGPT:
     def __init__(self, kanu, openai_key, model, temperature, prompt):
@@ -12,6 +12,7 @@ class ChatGPT:
         self.prompt = prompt
         openai.api_key = openai_key
         self.settings = Settings(self)
+        self.tokenizer = Tokenizer(model)
 
     def run(self):
         self.kanu.container.pack_forget()
@@ -34,6 +35,9 @@ class ChatGPT:
         b.grid(row=3, column=2)
         b = tk.Button(self.kanu.container, text="Settings", command=lambda: self.settings.page())
         b.grid(row=3, column=3)
+        self.tally = tk.Text(self.kanu.container, width=22, height=1)
+        self.tally.grid(row=4, column=0, columnspan=4)
+        self.tally.configure(background="gray93", foreground="red")
 
     def send_message(self, entry):
         if not self.messages:
@@ -48,8 +52,12 @@ class ChatGPT:
         self.messages += [{"role": "assistant", "content": response}]
         self.session.insert(tk.END, "You: " + entry.get() + "\n", "user")
         self.session.insert(tk.END, f"Bot: " + response + "\n", "bot")
+        self.tokenizer.add(entry.get())
+        self.tally.delete(1.0, tk.END)
+        self.tally.insert(tk.END, f"Tokens: {self.tokenizer.total} (${self.tokenizer.cost()})\n")
         entry.delete(0, tk.END)
 
     def clear_session(self):
         self.session.delete(1.0, tk.END)
         self.messages.clear()
+        self.tally.delete(1.0, tk.END)
