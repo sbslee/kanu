@@ -13,6 +13,7 @@ Other features of KANU inclde:
 
 - Customize chat settings (e.g. font size and background color)
 - Customize chatbot parameters (e.g. prompt, temperature, and chunk size) by directly using the GUI or uploading a configuration file
+- Display token counter and price monitor in chat window
 
 ## Installation
 
@@ -41,7 +42,8 @@ $ kanu
 The following packages are required to run ChatGPT:
 
 ```
-openai # Required.
+openai   # Required.
+tiktoken # Required.
 ```
 
 <a id="docgpt"></a>
@@ -60,7 +62,7 @@ The following packages are required to run DocGPT:
 
 ```
 langchain    # Required.
-chromadb     # Required. 
+chromadb     # Required.
 tiktoken     # Required.
 pdfminer.six # Optional. Only required for .pdf documents.
 unstructured # Optional. Only required for .doc and .docx documents.
