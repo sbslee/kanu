@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.6.0 (2023-06-12)
+* Enable users to chat with .csv documents.
+* Enable users to customize chat settings (e.g. font size and background color).
+
 ## 0.5.0 (2023-06-08)
 * Enable users to ask follow-up questions when chatting with documents.
 * Enable users to customize chatbot parameters by uploading a configuration file.

@@ -13,25 +13,30 @@ from langchain.memory import ConversationBufferMemory
 from langchain.document_loaders import (
     TextLoader,
     PDFMinerLoader,
-    UnstructuredWordDocumentLoader
+    UnstructuredWordDocumentLoader,
+    CSVLoader,
 )
 
-from .utils import Tooltip
+from .utils import Tooltip, Settings
 
 DOCUMENT_LOADERS = {
     ".txt": (TextLoader, {"encoding": "utf8"}),
     ".pdf": (PDFMinerLoader, {}),
     ".doc": (UnstructuredWordDocumentLoader, {}),
     ".docx": (UnstructuredWordDocumentLoader, {}),
+    ".csv": (CSVLoader, {}),
 }
 
 class DocGPT:
-    def __init__(self, kanu, openai_key, model, temperature, prompt):
+    def __init__(self, kanu, openai_key, model, temperature, prompt, default_chunk_size, default_chunk_overlap):
         self.kanu = kanu
         self.model = model
         self.temperature = temperature
         self.prompt = prompt
+        self.default_chunk_size = default_chunk_size
+        self.default_chunk_overlap = default_chunk_overlap
         os.environ["OPENAI_API_KEY"] = openai_key
+        self.settings = Settings(self)
 
     def run(self):
         self.kanu.container.pack_forget()
@@ -62,13 +67,13 @@ class DocGPT:
         l = tk.Label(self.kanu.container, text="Chunk size ⓘ:")
         Tooltip(l, "The maximum number of characters in each chunk.")
         l.grid(row=5, column=0)
-        self.chunk_size = tk.IntVar(self.kanu.container, value=1000)
+        self.chunk_size = tk.IntVar(self.kanu.container, value=self.default_chunk_size)
         e = tk.Entry(self.kanu.container, textvariable=self.chunk_size)
         e.grid(row=5, column=1, columnspan=2)
         l = tk.Label(self.kanu.container, text="Chunk overlap ⓘ:")
         Tooltip(l, "The number of overlapping characters between adjacent chunks.")
         l.grid(row=6, column=0)
-        self.chunk_overlap = tk.IntVar(self.kanu.container, value=50)
+        self.chunk_overlap = tk.IntVar(self.kanu.container, value=self.default_chunk_overlap)
         e = tk.Entry(self.kanu.container, textvariable=self.chunk_overlap)
         e.grid(row=6, column=1, columnspan=2)
         self.option1_button = tk.Button(self.kanu.container, text="Go with Option 1", command=self.go_with_option1)
@@ -101,22 +106,26 @@ class DocGPT:
         self.kanu.container = tk.Frame(self.kanu.root)
         self.kanu.container.pack()
         l = tk.Label(self.kanu.container, text="DocGPT")
-        l.grid(row=0, column=0, columnspan=3)    
+        l.grid(row=0, column=0, columnspan=4)    
         self.session = tk.Text(self.kanu.container, width=70, height=20)
-        self.session.grid(row=1, column=0, columnspan=3)
-        e = tk.Entry(self.kanu.container, width=54)
-        e.grid(row=2, column=0, columnspan=3)
-        b = tk.Button(self.kanu.container, text="Send", command=lambda: self.send_message(e))
+        self.session.grid(row=1, column=0, columnspan=4)
+        self.session.tag_config("user", **self.settings.get_user_kwargs())
+        self.session.tag_config("bot", **self.settings.get_bot_kwargs())
+        user_input = tk.Entry(self.kanu.container, width=54)
+        user_input.grid(row=2, column=0, columnspan=4)
+        b = tk.Button(self.kanu.container, text="Send", command=lambda: self.send_message(user_input))
         b.grid(row=3, column=0)
         b = tk.Button(self.kanu.container, text="Clear", command=lambda: self.clear_session())
         b.grid(row=3, column=1)
         b = tk.Button(self.kanu.container, text="Go back", command=lambda: self.run())
         b.grid(row=3, column=2)
+        b = tk.Button(self.kanu.container, text="Settings", command=lambda: self.settings.page())
+        b.grid(row=3, column=3)
 
     def send_message(self, entry):
-        self.session.insert(tk.END, "You: " + entry.get() + "\n")
+        self.session.insert(tk.END, "You: " + entry.get() + "\n", "user")
         response = self.qa(entry.get())["answer"]
-        self.session.insert(tk.END, "Bot: " + response + "\n")
+        self.session.insert(tk.END, "Bot: " + response + "\n", "bot")
         entry.delete(0, tk.END)
 
     def go_with_option1(self):
@@ -129,12 +138,12 @@ class DocGPT:
                     continue
                 loader_class, loader_kwargs = DOCUMENT_LOADERS[file_ext]
                 loader = loader_class(file_path, **loader_kwargs)
-                document = loader.load()[0]
-                documents.append(document)
+                document = loader.load()
+                documents.extend(document)
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=self.chunk_size.get(), chunk_overlap=self.chunk_overlap.get())
         texts = text_splitter.split_documents(documents)
         db = Chroma.from_documents(texts, OpenAIEmbeddings(), persist_directory=self.database_directory)
-        db.add_documents(texts)    
+        db.add_documents(texts)
         db.persist()
         db = None
         self.query()
