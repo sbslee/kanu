@@ -70,4 +70,5 @@ class ChatGPT:
         return message
 
     def clear_session(self):
+        self.tokens = self.price = 0
         self.run()
