@@ -151,6 +151,7 @@ class DocGPT:
         return message
 
     def go_with_option1(self):
+        self.tokens = self.price = 0
         documents = []
         for root, dirs, files in os.walk(self.document_directory):
             for file in files:
@@ -175,6 +176,7 @@ class DocGPT:
         self.query()
 
     def go_with_option2(self):
+        self.tokens = self.price = 0
         self.existing = True
         self.query()
 
@@ -205,8 +207,6 @@ class DocGPT:
         self.option2_button["state"] = tk.NORMAL
 
     def clear_session(self):
+        self.existing = True
+        self.tokens = self.price = 0
         self.query()
-        # self.session.delete(1.0, tk.END)
-        # self.system.delete(1.0, tk.END)
-        # self.system.insert(tk.END, "System: A new chat session has been created.\n", "system")
-
