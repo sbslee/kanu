@@ -9,6 +9,7 @@ from langchain.chat_models import ChatOpenAI
 from langchain.chains import ConversationalRetrievalChain
 from langchain.prompts import PromptTemplate
 from langchain.memory import ConversationBufferMemory
+from langchain.callbacks import get_openai_callback
 
 from langchain.document_loaders import (
     TextLoader,
@@ -17,7 +18,7 @@ from langchain.document_loaders import (
     CSVLoader,
 )
 
-from .utils import Tooltip, Settings, Tokenizer
+from .utils import Tooltip, Settings, tokens2price, text2tokens
 
 DOCUMENT_LOADERS = {
     ".txt": (TextLoader, {"encoding": "utf8"}),
@@ -37,7 +38,8 @@ class DocGPT:
         self.default_chunk_overlap = default_chunk_overlap
         os.environ["OPENAI_API_KEY"] = openai_key
         self.settings = Settings(self)
-        self.tokenizer = Tokenizer(model)
+        self.tokens = 0
+        self.price = 0
 
     def run(self):
         self.kanu.container.pack_forget()
@@ -108,14 +110,19 @@ class DocGPT:
         self.kanu.container.pack()
         l = tk.Label(self.kanu.container, text="DocGPT")
         l.grid(row=0, column=0, columnspan=4)
-        self.tally = tk.Text(self.kanu.container, width=70, height=1)
-        self.tally.insert(tk.END, "Tokens: 0 ($0)\n")
-        self.tally.grid(row=1, column=0, columnspan=4)
-        self.session = tk.Text(self.kanu.container, width=70, height=20)
+        self.system = tk.Text(self.kanu.container, width=80, height=7)
+        self.system.tag_configure("system", **self.settings.get_system_kwargs())
+        if self.existing:
+            self.system.insert(tk.END, "System: Using existing database. No tokens were used.\n", "system")
+        else:
+            self.system.insert(tk.END, f"System: Creating new database. Embedding used {self.tokens:,} tokens or ${self.price:.6f}.\n", "system")
+        self.system.insert(tk.END, "System: A new chat session has been created.\n", "system")
+        self.system.grid(row=1, column=0, columnspan=4)
+        self.session = tk.Text(self.kanu.container, width=80, height=20)
         self.session.grid(row=2, column=0, columnspan=4)
         self.session.tag_config("user", **self.settings.get_user_kwargs())
         self.session.tag_config("bot", **self.settings.get_bot_kwargs())
-        user_input = tk.Entry(self.kanu.container, width=54)
+        user_input = tk.Entry(self.kanu.container, width=62)
         user_input.grid(row=3, column=0, columnspan=4)
         b = tk.Button(self.kanu.container, text="Send", command=lambda: self.send_message(user_input))
         b.grid(row=4, column=0)
@@ -128,12 +135,20 @@ class DocGPT:
 
     def send_message(self, entry):
         self.session.insert(tk.END, "You: " + entry.get() + "\n", "user")
-        response = self.qa(entry.get())["answer"]
-        self.session.insert(tk.END, "Bot: " + response + "\n", "bot")
-        self.tokenizer.add(entry.get())
-        self.tally.delete(1.0, tk.END)
-        self.tally.insert(tk.END, f"Tokens: {self.tokenizer.total} (${self.tokenizer.cost():.6f})\n")
+        with get_openai_callback() as cb:
+            response = self.qa(entry.get())
+            usage = self.calculate_usage(cb)
+        self.session.insert(tk.END, "Bot: " + response["answer"] + "\n", "bot")
+        self.system.insert(tk.END, f"{usage}\n", "system")
         entry.delete(0, tk.END)
+
+    def calculate_usage(self, cb):
+        prompt_price = tokens2price(cb.prompt_tokens, self.model, "prompt")
+        completion_price = tokens2price(cb.completion_tokens, self.model, "completion")
+        self.price += prompt_price + completion_price
+        self.tokens += cb.total_tokens
+        message = f"System: Used {cb.prompt_tokens:,} prompt + {cb.completion_tokens:,} completion = {cb.total_tokens:,} tokens (total: {self.tokens:,} or ${self.price:.6f})."
+        return message
 
     def go_with_option1(self):
         documents = []
@@ -149,13 +164,18 @@ class DocGPT:
                 documents.extend(document)
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=self.chunk_size.get(), chunk_overlap=self.chunk_overlap.get())
         texts = text_splitter.split_documents(documents)
-        db = Chroma.from_documents(texts, OpenAIEmbeddings(), persist_directory=self.database_directory)
+        for text in texts:
+            self.tokens += text2tokens("text-embedding-ada-002", text.page_content)
+        self.price = tokens2price(self.tokens, "text-embedding-ada-002", "embedding")
+        db = Chroma.from_documents(texts, OpenAIEmbeddings(model="text-embedding-ada-002"), persist_directory=self.database_directory)
         db.add_documents(texts)
         db.persist()
         db = None
+        self.existing = False
         self.query()
 
     def go_with_option2(self):
+        self.existing = True
         self.query()
 
     def specify_document_directory(self):
@@ -185,6 +205,8 @@ class DocGPT:
         self.option2_button["state"] = tk.NORMAL
 
     def clear_session(self):
-        self.session.delete(1.0, tk.END)
-        self.tally.insert(tk.END, "Tokens: 0 ($0)\n")
+        self.query()
+        # self.session.delete(1.0, tk.END)
+        # self.system.delete(1.0, tk.END)
+        # self.system.insert(tk.END, "System: A new chat session has been created.\n", "system")
 

@@ -43,7 +43,6 @@ The following packages are required to run ChatGPT:
 
 ```
 openai   # Required.
-tiktoken # Required.
 ```
 
 <a id="docgpt"></a>
