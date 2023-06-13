@@ -42,7 +42,7 @@ $ kanu
 The following packages are required to run ChatGPT:
 
 ```
-openai   # Required.
+openai # Required.
 ```
 
 <a id="docgpt"></a>
