@@ -45,6 +45,8 @@ class DocGPT:
         self.kanu.container.pack_forget()
         self.kanu.container = tk.Frame(self.kanu.root)
         self.kanu.container.pack()
+        self.kanu.container.bind_all("<Return>", lambda event: self.send_message())
+        self.kanu.container.focus_set()
         l = tk.Label(self.kanu.container, text="DocGPT")
         l.grid(row=0, column=0, columnspan=3)
         b = tk.Button(self.kanu.container, text="Go back", command=lambda: self.kanu.config_docgpt())
@@ -122,9 +124,12 @@ class DocGPT:
         self.session.grid(row=2, column=0, columnspan=4)
         self.session.tag_config("user", **self.settings.get_user_kwargs())
         self.session.tag_config("bot", **self.settings.get_bot_kwargs())
-        user_input = tk.Entry(self.kanu.container, width=62)
-        user_input.grid(row=3, column=0, columnspan=4)
-        b = tk.Button(self.kanu.container, text="Send", command=lambda: self.send_message(user_input))
+
+        self.user_input = tk.StringVar()
+        self.chatbox = tk.Entry(self.kanu.container, width=62, textvariable=self.user_input)
+        self.chatbox.grid(row=3, column=0, columnspan=4)
+
+        b = tk.Button(self.kanu.container, text="Send", command=lambda: self.send_message())
         b.grid(row=4, column=0)
         b = tk.Button(self.kanu.container, text="Clear", command=lambda: self.clear_session())
         b.grid(row=4, column=1)
@@ -133,14 +138,14 @@ class DocGPT:
         b = tk.Button(self.kanu.container, text="Settings", command=lambda: self.settings.page())
         b.grid(row=4, column=3)
 
-    def send_message(self, entry):
-        self.session.insert(tk.END, "You: " + entry.get() + "\n", "user")
+    def send_message(self):
+        self.session.insert(tk.END, "You: " + self.user_input.get() + "\n", "user")
         with get_openai_callback() as cb:
-            response = self.qa(entry.get())
+            response = self.qa(self.user_input.get())
             usage = self.calculate_usage(cb)
         self.session.insert(tk.END, "Bot: " + response["answer"] + "\n", "bot")
         self.system.insert(tk.END, f"{usage}\n", "system")
-        entry.delete(0, tk.END)
+        self.chatbox.delete(0, tk.END)
 
     def calculate_usage(self, cb):
         prompt_price = tokens2price(cb.prompt_tokens, self.model, "prompt")
