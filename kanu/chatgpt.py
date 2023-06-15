@@ -2,7 +2,8 @@ import tkinter as tk
 
 import openai
 
-from .utils import Settings, tokens2price
+from .gui import Settings
+from .utils import tokens2price
 
 class ChatGPT:
     def __init__(self, kanu, openai_key, model, temperature, prompt):

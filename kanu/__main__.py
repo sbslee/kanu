@@ -4,7 +4,7 @@ from tkinter import filedialog
 import importlib.util
 
 from .version import __version__
-from .utils import Tooltip
+from .gui import Tooltip
 
 CHATGPT_PROMPT = """You are a helpful assistant."""
 DOCGPT_PROMPT = """Use the following pieces of context to answer the question at the end. If you don't know the answer, just say that you don't know, don't try to make up an answer.

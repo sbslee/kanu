@@ -18,7 +18,8 @@ from langchain.document_loaders import (
     CSVLoader,
 )
 
-from .utils import Tooltip, Settings, tokens2price, text2tokens
+from .gui import Tooltip, Settings
+from .utils import tokens2price, text2tokens
 
 DOCUMENT_LOADERS = {
     ".txt": (TextLoader, {"encoding": "utf8"}),
@@ -115,7 +116,7 @@ class DocGPT:
         self.system = tk.Text(self.kanu.container, width=80, height=7)
         self.system.tag_configure("system", **self.settings.get_system_kwargs())
         if self.existing:
-            self.system.insert(tk.END, "System: Using existing database. No tokens were used.\n", "system")
+            self.system.insert(tk.END, "System: Using existing database. Embedding was skipped and no tokens were used.\n", "system")
         else:
             self.system.insert(tk.END, f"System: Creating new database. Embedding used {self.tokens:,} tokens or ${self.price:.6f}.\n", "system")
         self.system.insert(tk.END, "System: A new chat session has been created.\n", "system")
