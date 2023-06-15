@@ -10,7 +10,6 @@ from langchain.chains import ConversationalRetrievalChain
 from langchain.prompts import PromptTemplate
 from langchain.memory import ConversationBufferMemory
 from langchain.callbacks import get_openai_callback
-
 from langchain.document_loaders import (
     TextLoader,
     PDFMinerLoader,
@@ -30,7 +29,16 @@ DOCUMENT_LOADERS = {
 }
 
 class DocGPT:
-    def __init__(self, kanu, openai_key, model, temperature, prompt, default_chunk_size, default_chunk_overlap):
+    def __init__(
+        self,
+        kanu,
+        openai_key,
+        model,
+        temperature,
+        prompt,
+        default_chunk_size,
+        default_chunk_overlap
+    ):
         self.kanu = kanu
         self.model = model
         self.temperature = temperature
