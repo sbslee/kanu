@@ -20,7 +20,7 @@ def tokens2price(tokens, model, task):
             raise ValueError(f"Tokens too large for {model}: {tokens}")
     elif model == "text-embedding-ada-002":
         if task == "embedding":
-            return 0.0004 / 1000 * tokens
+            return 0.0001 / 1000 * tokens
         else:
             raise ValueError(f"Invalid task for {model}: {task}")
     elif model == "gpt-4":
