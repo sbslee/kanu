@@ -50,12 +50,7 @@ openai # Required.
 
 ![Alt Text](https://raw.githubusercontent.com/sbslee/kanu/main/images/docgpt.gif)
 
-The following document formats are supported by DocGPT:
-
-- .txt
-- .pdf
-- .doc and .docx
-- .csv
+DocGPT currently supports the following document formats: `.csv`, `.doc`, `.docx`, `.pdf`, and `.txt`.
 
 The following packages are required to run DocGPT:
 
