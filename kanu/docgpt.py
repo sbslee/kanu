@@ -127,7 +127,7 @@ class DocGPT:
             self.system.insert(tk.END, "System: Using existing database. Embedding was skipped and no tokens were used.\n", "system")
         else:
             self.system.insert(tk.END, f"System: Creating new database. Embedding used {self.tokens:,} tokens or ${self.price:.6f}.\n", "system")
-        self.system.insert(tk.END, "System: A new chat session has been created.\n", "system")
+        self.system.insert(tk.END, f"System: A new chat session has been created using {self.model}.\n", "system")
         self.system.grid(row=1, column=0, columnspan=4, sticky="ew")
         self.session = tk.Text(self.kanu.container)
         self.session.grid(row=2, column=0, columnspan=4, sticky="nsew")
@@ -161,8 +161,8 @@ class DocGPT:
         self.chatbox.delete(0, tk.END)
 
     def calculate_usage(self, cb):
-        prompt_price = tokens2price(cb.prompt_tokens, self.model, "prompt")
-        completion_price = tokens2price(cb.completion_tokens, self.model, "completion")
+        prompt_price = tokens2price(self.model, "prompt", cb.prompt_tokens)
+        completion_price = tokens2price(self.model, "completion", cb.completion_tokens)
         self.price += prompt_price + completion_price
         self.tokens += cb.total_tokens
         message = f"System: Used {cb.prompt_tokens:,} prompt + {cb.completion_tokens:,} completion = {cb.total_tokens:,} tokens (total: {self.tokens:,} or ${self.price:.6f})."
@@ -185,7 +185,7 @@ class DocGPT:
         texts = text_splitter.split_documents(documents)
         for text in texts:
             self.tokens += text2tokens("text-embedding-ada-002", text.page_content)
-        self.price = tokens2price(self.tokens, "text-embedding-ada-002", "embedding")
+        self.price = tokens2price("text-embedding-ada-002", "embedding", self.tokens)
         db = Chroma.from_documents(texts, OpenAIEmbeddings(model="text-embedding-ada-002"), persist_directory=self.database_directory)
         db.add_documents(texts)
         db.persist()

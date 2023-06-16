@@ -26,7 +26,7 @@ class ChatGPT:
         l.grid(row=0, column=0, columnspan=4, sticky="ew")
         self.system = tk.Text(self.kanu.container, height=7)
         self.system.tag_configure("system", **self.settings.get_system_kwargs())
-        self.system.insert(tk.END, "System: A new chat session has been created.\n", "system")
+        self.system.insert(tk.END, f"System: A new chat session has been created using {self.model}.\n", "system")
         self.system.grid(row=1, column=0, columnspan=4, sticky="ew")
         self.session = tk.Text(self.kanu.container)
         self.session.grid(row=2, column=0, columnspan=4, sticky="nsew")
@@ -72,8 +72,8 @@ class ChatGPT:
         total_tokens = response["usage"]["total_tokens"]
         prompt_tokens = response["usage"]["prompt_tokens"]
         completion_tokens = response["usage"]["completion_tokens"]
-        prompt_price = tokens2price(prompt_tokens, self.model, "prompt")
-        completion_price = tokens2price(completion_tokens, self.model, "completion")
+        prompt_price = tokens2price(self.model, "prompt", prompt_tokens)
+        completion_price = tokens2price(self.model, "completion", completion_tokens)
         self.price += prompt_price + completion_price
         self.tokens += total_tokens
         message = f"System: Used {prompt_tokens:,} prompt + {completion_tokens:,} completion = {total_tokens:,} tokens (total: {self.tokens:,} or ${self.price:.6f})."

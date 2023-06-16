@@ -1,11 +1,13 @@
 import configparser
 import tkinter as tk
+from tkinter import ttk
 from tkinter import filedialog
 import importlib.util
 
 from .version import __version__
 from .gui import Tooltip
 
+GPT_MODELS = ["gpt-3.5-turbo", "gpt-3.5-turbo-16k", "gpt-4", "gpt-4-32k"]
 CHATGPT_PROMPT = """You are a helpful assistant."""
 DOCGPT_PROMPT = """Use the following pieces of context to answer the question at the end. If you don't know the answer, just say that you don't know, don't try to make up an answer.
 
@@ -51,13 +53,11 @@ class KANU:
         b.grid(row=4, column=1)
         m = tk.Message(self.container, width=300, text="Option 2. Configure manually")
         m.grid(row=5, column=0, columnspan=2)
-        self.model = tk.StringVar(self.container, value="gpt-3.5-turbo")
         l = tk.Label(self.container, text="Model:")
         l.grid(row=6, column=0, columnspan=2)
-        b = tk.Radiobutton(self.container, variable=self.model, text="gpt-3.5-turbo", value="gpt-3.5-turbo")
-        b.grid(row=7, column=0)
-        b = tk.Radiobutton(self.container, variable=self.model, text="gpt-4", value="gpt-4")
-        b.grid(row=7, column=1)
+        self.model = tk.StringVar(self.container, value="gpt-3.5-turbo")
+        om = ttk.OptionMenu(self.container, self.model, *GPT_MODELS)
+        om.grid(row=7, column=0, columnspan=2)
         l = tk.Label(self.container, text="System message ⓘ:")
         Tooltip(l, "The system message helps set the behavior of the chatbot.")
         l.grid(row=8, column=0, columnspan=2)
@@ -127,10 +127,8 @@ class KANU:
         self.model = tk.StringVar(self.container, value="gpt-3.5-turbo")
         l = tk.Label(self.container, text="Model:")
         l.grid(row=12, column=0, columnspan=2)
-        rb = tk.Radiobutton(self.container, variable=self.model, text="gpt-3.5-turbo", value="gpt-3.5-turbo")
-        rb.grid(row=13, column=0)
-        rb = tk.Radiobutton(self.container, variable=self.model, text="gpt-4", value="gpt-4")
-        rb.grid(row=13, column=1)
+        om = ttk.OptionMenu(self.container, self.model, *GPT_MODELS)
+        om.grid(row=13, column=0, columnspan=2)
         l = tk.Label(self.container, text="System message ⓘ:")
         Tooltip(l, "The system message helps set the behavior of the chatbot.")
         l.grid(row=14, column=0, columnspan=2)
