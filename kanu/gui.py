@@ -116,7 +116,7 @@ class Settings:
     def go_back(self):
         self.agent.kanu.container.pack_forget()
         self.agent.kanu.container = self.agent.previous
-        self.agent.kanu.container.pack()
+        self.agent.kanu.container.pack(fill="both", expand=True)
 
     def apply(self):
         self.agent.session.tag_config("user", **self.get_user_kwargs())
