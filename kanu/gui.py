@@ -124,7 +124,7 @@ class Settings:
         self.agent.system.tag_config("system", **self.get_system_kwargs())
         self.agent.kanu.container.pack_forget()
         self.agent.kanu.container = self.agent.previous
-        self.agent.kanu.container.pack()
+        self.agent.kanu.container.pack(fill="both", expand=True)
 
     def reset(self):
         self.user_background_color = tk.StringVar(self.agent.kanu.container, value=self.default_user_background_color)
@@ -135,6 +135,10 @@ class Settings:
         self.bot_foreground_color = tk.StringVar(self.agent.kanu.container, value=self.default_bot_foreground_color)
         self.bot_font_family = tk.StringVar(self.agent.kanu.container, value=self.default_bot_font_family)
         self.bot_font_size = tk.IntVar(self.agent.kanu.container, value=self.default_bot_font_size)
+        self.system_background_color = tk.StringVar(self.agent.kanu.container, value=self.default_system_background_color)
+        self.system_foreground_color = tk.StringVar(self.agent.kanu.container, value=self.default_system_foreground_color)
+        self.system_font_family = tk.StringVar(self.agent.kanu.container, value=self.default_system_font_family)
+        self.system_font_size = tk.IntVar(self.agent.kanu.container, value=self.default_system_font_size)
         self.apply()
 
 class Tooltip:
