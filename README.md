@@ -11,8 +11,8 @@ There are currently two chatbots available in KANU:
 
 Other features of KANU inclde:
 
-- Customize chat settings (e.g. font size and background color)
 - Customize chatbot parameters (e.g. prompt, temperature, and chunk size) by directly using the GUI or uploading a configuration file
+- Customize chat settings (e.g. font size and background color)
 - Display token counter and price monitor in chat window
 
 ## Installation
