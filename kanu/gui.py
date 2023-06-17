@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import font
+from tkinter import font, filedialog
 
 class Conversation:
     def __init__(self, agent):
@@ -18,7 +18,7 @@ class Conversation:
         self.agent.kanu.container.bind_all("<Return>", lambda event: self.agent.send_message())
         self.agent.kanu.container.focus_set()
         l = tk.Label(self.agent.kanu.container, text=self.name)
-        l.grid(row=0, column=0, columnspan=4, sticky="ew")
+        l.grid(row=0, column=0, sticky="ew")
         self.agent.system = tk.Text(self.agent.kanu.container, height=7)
         self.agent.system.tag_configure("system", **self.agent.settings.get_system_kwargs())
         if self.name == "DocGPT":
@@ -27,14 +27,14 @@ class Conversation:
             else:
                 self.agent.system.insert(tk.END, f"System: Creating new database. Embedding used {self.agent.tokens:,} tokens or ${self.agent.price:.6f}.\n", "system")
         self.agent.system.insert(tk.END, f"System: A new chat session has been created using {self.agent.model}.\n", "system")
-        self.agent.system.grid(row=1, column=0, columnspan=4, sticky="ew")
+        self.agent.system.grid(row=1, column=0, sticky="ew")
         self.agent.session = tk.Text(self.agent.kanu.container)
-        self.agent.session.grid(row=2, column=0, columnspan=4, sticky="nsew")
+        self.agent.session.grid(row=2, column=0, sticky="nsew")
         self.agent.session.tag_config("user", **self.agent.settings.get_user_kwargs())
         self.agent.session.tag_config("bot", **self.agent.settings.get_bot_kwargs())
         self.agent.user_input = tk.StringVar()
         self.agent.chatbox = tk.Entry(self.agent.kanu.container, textvariable=self.agent.user_input)
-        self.agent.chatbox.grid(row=3, column=0, columnspan=4, sticky="ew")
+        self.agent.chatbox.grid(row=3, column=0, sticky="ew")
         self.agent.messages = []
         button_frame = tk.Frame(self.agent.kanu.container)
         button_frame.grid(row=4, column=0, sticky="ew")
@@ -46,10 +46,23 @@ class Conversation:
         b.grid(row=0, column=2, sticky="ew")
         b = tk.Button(button_frame, text="Settings", command=lambda: self.agent.settings.page())
         b.grid(row=0, column=3, sticky="ew")
+        b = tk.Button(button_frame, text="Save", command=lambda: self.save())
+        b.grid(row=0, column=4, sticky="ew")
         self.agent.kanu.container.grid_columnconfigure(0, weight=1)
         self.agent.kanu.container.grid_rowconfigure(2, weight=1)
-        for i in range(4):
+        for i in range(5):
             button_frame.grid_columnconfigure(i, weight=1)
+
+    def save(self):
+        file_path = filedialog.asksaveasfilename()
+        if not file_path:
+            return
+        data = "[System]\n"
+        data += self.agent.system.get("1.0", tk.END).rstrip()
+        data += "\n\n[Session]\n"
+        data += self.agent.session.get("1.0", tk.END).rstrip()
+        with open(file_path, 'w') as f:
+            f.write(data)
 
 class Settings:
     def __init__(self, agent):

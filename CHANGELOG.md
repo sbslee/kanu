@@ -4,6 +4,7 @@
 * Implement token counter and price monitor in chat window.
 * Enable the Enter key for sending messages in chat window.
 * Enable automatic chat session resizing based on window size.
+* Enable users to download chat session as a text file.
 
 ## 0.6.0 (2023-06-12)
 * Enable users to chat with .csv documents.
