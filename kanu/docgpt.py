@@ -17,7 +17,7 @@ from langchain.document_loaders import (
     CSVLoader,
 )
 
-from .gui import Tooltip, Settings
+from .gui import Tooltip, Settings, Conversation
 from .utils import tokens2price, text2tokens
 
 DOCUMENT_LOADERS = {
@@ -47,6 +47,7 @@ class DocGPT:
         self.default_chunk_overlap = default_chunk_overlap
         os.environ["OPENAI_API_KEY"] = openai_key
         self.settings = Settings(self)
+        self.conversation = Conversation(self)
         self.tokens = 0
         self.price = 0
 
@@ -116,40 +117,7 @@ class DocGPT:
             chain_type="stuff",
             combine_docs_chain_kwargs={"prompt": PromptTemplate(template=self.prompt, input_variables=["context", "question"])}
         )
-        self.kanu.container.pack_forget()
-        self.kanu.container = tk.Frame(self.kanu.root)
-        self.kanu.container.pack(fill="both", expand=True)
-        l = tk.Label(self.kanu.container, text="DocGPT")
-        l.grid(row=0, column=0, columnspan=4, sticky="ew")
-        self.system = tk.Text(self.kanu.container, height=7)
-        self.system.tag_configure("system", **self.settings.get_system_kwargs())
-        if self.existing:
-            self.system.insert(tk.END, "System: Using existing database. Embedding was skipped and no tokens were used.\n", "system")
-        else:
-            self.system.insert(tk.END, f"System: Creating new database. Embedding used {self.tokens:,} tokens or ${self.price:.6f}.\n", "system")
-        self.system.insert(tk.END, f"System: A new chat session has been created using {self.model}.\n", "system")
-        self.system.grid(row=1, column=0, columnspan=4, sticky="ew")
-        self.session = tk.Text(self.kanu.container)
-        self.session.grid(row=2, column=0, columnspan=4, sticky="nsew")
-        self.session.tag_config("user", **self.settings.get_user_kwargs())
-        self.session.tag_config("bot", **self.settings.get_bot_kwargs())
-        self.user_input = tk.StringVar()
-        self.chatbox = tk.Entry(self.kanu.container, width=62, textvariable=self.user_input)
-        self.chatbox.grid(row=3, column=0, columnspan=4, sticky="ew")
-        button_frame = tk.Frame(self.kanu.container)
-        button_frame.grid(row=4, column=0, sticky="ew")
-        b = tk.Button(button_frame, text="Send", command=lambda: self.send_message())
-        b.grid(row=0, column=0, sticky="ew")
-        b = tk.Button(button_frame, text="Clear", command=lambda: self.clear_session())
-        b.grid(row=0, column=1, sticky="ew")
-        b = tk.Button(button_frame, text="Go back", command=lambda: self.kanu.config_chatgpt())
-        b.grid(row=0, column=2, sticky="ew")
-        b = tk.Button(button_frame, text="Settings", command=lambda: self.settings.page())
-        b.grid(row=0, column=3, sticky="ew")
-        self.kanu.container.grid_columnconfigure(0, weight=1)
-        self.kanu.container.grid_rowconfigure(2, weight=1)
-        for i in range(4):
-            button_frame.grid_columnconfigure(i, weight=1)
+        self.conversation.page()
 
     def send_message(self):
         self.session.insert(tk.END, "You: " + self.user_input.get() + "\n", "user")

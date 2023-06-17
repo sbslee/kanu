@@ -1,6 +1,51 @@
 import tkinter as tk
 from tkinter import font
 
+class Conversation:
+    def __init__(self, agent):
+        self.agent = agent
+
+    def page(self):
+        self.agent.previous = self.agent.kanu.container
+        self.agent.kanu.container.pack_forget()
+        self.agent.kanu.container = tk.Frame(self.agent.kanu.root)
+        self.agent.kanu.container.pack(fill="both", expand=True)
+        self.agent.kanu.container.bind_all("<Return>", lambda event: self.agent.send_message())
+        self.agent.kanu.container.focus_set()
+        l = tk.Label(self.agent.kanu.container, text=self.agent.__class__.__name__)
+        l.grid(row=0, column=0, columnspan=4, sticky="ew")
+        self.agent.system = tk.Text(self.agent.kanu.container, height=7)
+        self.agent.system.tag_configure("system", **self.agent.settings.get_system_kwargs())
+        if self.agent.__class__.__name__ == "DocGPT":
+            if self.agent.existing:
+                self.agent.system.insert(tk.END, "System: Using existing database. Embedding was skipped and no tokens were used.\n", "system")
+            else:
+                self.agent.system.insert(tk.END, f"System: Creating new database. Embedding used {self.agent.tokens:,} tokens or ${self.agent.price:.6f}.\n", "system")
+        self.agent.system.insert(tk.END, f"System: A new chat session has been created using {self.agent.model}.\n", "system")
+        self.agent.system.grid(row=1, column=0, columnspan=4, sticky="ew")
+        self.agent.session = tk.Text(self.agent.kanu.container)
+        self.agent.session.grid(row=2, column=0, columnspan=4, sticky="nsew")
+        self.agent.session.tag_config("user", **self.agent.settings.get_user_kwargs())
+        self.agent.session.tag_config("bot", **self.agent.settings.get_bot_kwargs())
+        self.agent.user_input = tk.StringVar()
+        self.agent.chatbox = tk.Entry(self.agent.kanu.container, textvariable=self.agent.user_input)
+        self.agent.chatbox.grid(row=3, column=0, columnspan=4, sticky="ew")
+        self.agent.messages = []
+        button_frame = tk.Frame(self.agent.kanu.container)
+        button_frame.grid(row=4, column=0, sticky="ew")
+        b = tk.Button(button_frame, text="Send", command=lambda: self.agent.send_message())
+        b.grid(row=0, column=0, sticky="ew")
+        b = tk.Button(button_frame, text="Clear", command=lambda: self.agent.clear_session())
+        b.grid(row=0, column=1, sticky="ew")
+        b = tk.Button(button_frame, text="Go back", command=lambda: self.agent.kanu.config_chatgpt())
+        b.grid(row=0, column=2, sticky="ew")
+        b = tk.Button(button_frame, text="Settings", command=lambda: self.agent.settings.page())
+        b.grid(row=0, column=3, sticky="ew")
+        self.agent.kanu.container.grid_columnconfigure(0, weight=1)
+        self.agent.kanu.container.grid_rowconfigure(2, weight=1)
+        for i in range(4):
+            button_frame.grid_columnconfigure(i, weight=1)
+
 class Settings:
     def __init__(self, agent):
         self.agent = agent
