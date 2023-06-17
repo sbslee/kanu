@@ -4,6 +4,11 @@ from tkinter import font
 class Conversation:
     def __init__(self, agent):
         self.agent = agent
+        self.name = self.agent.__class__.__name__
+        if self.name == "ChatGPT":
+            self.config = self.agent.kanu.config_chatgpt
+        else:
+            self.config = self.agent.kanu.config_docgpt
 
     def page(self):
         self.agent.previous = self.agent.kanu.container
@@ -12,11 +17,11 @@ class Conversation:
         self.agent.kanu.container.pack(fill="both", expand=True)
         self.agent.kanu.container.bind_all("<Return>", lambda event: self.agent.send_message())
         self.agent.kanu.container.focus_set()
-        l = tk.Label(self.agent.kanu.container, text=self.agent.__class__.__name__)
+        l = tk.Label(self.agent.kanu.container, text=self.name)
         l.grid(row=0, column=0, columnspan=4, sticky="ew")
         self.agent.system = tk.Text(self.agent.kanu.container, height=7)
         self.agent.system.tag_configure("system", **self.agent.settings.get_system_kwargs())
-        if self.agent.__class__.__name__ == "DocGPT":
+        if self.name == "DocGPT":
             if self.agent.existing:
                 self.agent.system.insert(tk.END, "System: Using existing database. Embedding was skipped and no tokens were used.\n", "system")
             else:
@@ -37,7 +42,7 @@ class Conversation:
         b.grid(row=0, column=0, sticky="ew")
         b = tk.Button(button_frame, text="Clear", command=lambda: self.agent.clear_session())
         b.grid(row=0, column=1, sticky="ew")
-        b = tk.Button(button_frame, text="Go back", command=lambda: self.agent.kanu.config_chatgpt())
+        b = tk.Button(button_frame, text="Go back", command=lambda: self.config())
         b.grid(row=0, column=2, sticky="ew")
         b = tk.Button(button_frame, text="Settings", command=lambda: self.agent.settings.page())
         b.grid(row=0, column=3, sticky="ew")
