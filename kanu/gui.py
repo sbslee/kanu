@@ -6,9 +6,9 @@ class Conversation:
         self.agent = agent
         self.name = self.agent.__class__.__name__
         if self.name == "ChatGPT":
-            self.config = self.agent.kanu.config_chatgpt
+            self.go_back = self.agent.kanu.config_chatgpt
         else:
-            self.config = self.agent.kanu.config_docgpt
+            self.go_back = self.agent.run
 
     def page(self):
         self.agent.previous = self.agent.kanu.container
@@ -42,7 +42,7 @@ class Conversation:
         b.grid(row=0, column=0, sticky="ew")
         b = tk.Button(button_frame, text="Clear", command=lambda: self.agent.clear_session())
         b.grid(row=0, column=1, sticky="ew")
-        b = tk.Button(button_frame, text="Go back", command=lambda: self.config())
+        b = tk.Button(button_frame, text="Go back", command=lambda: self.go_back())
         b.grid(row=0, column=2, sticky="ew")
         b = tk.Button(button_frame, text="Settings", command=lambda: self.agent.settings.page())
         b.grid(row=0, column=3, sticky="ew")
