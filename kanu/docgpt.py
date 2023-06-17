@@ -37,7 +37,10 @@ class DocGPT:
         temperature,
         prompt,
         default_chunk_size,
-        default_chunk_overlap
+        default_chunk_overlap,
+        new_database_directory=None,
+        document_directory=None,
+        existing_database_directory=None,
     ):
         self.kanu = kanu
         self.model = model
@@ -50,6 +53,9 @@ class DocGPT:
         self.conversation = Conversation(self)
         self.tokens = 0
         self.price = 0
+        self.new_database_directory = new_database_directory
+        self.document_directory = document_directory
+        self.existing_database_directory = existing_database_directory
 
     def run(self):
         self.kanu.container.pack_forget()
@@ -99,13 +105,22 @@ class DocGPT:
         l = tk.Label(self.kanu.container, text="Database ⓘ:")
         Tooltip(l, "Directory where the database is stored.")
         l.grid(row=9, column=0)
-        self.old_database_label = tk.Label(self.kanu.container, text="Not selected", fg="red")
-        self.old_database_label.grid(row=9, column=1)
-        b = tk.Button(self.kanu.container, text="Browse", command=self.specify_old_database_directory)
+        self.existing_database_label = tk.Label(self.kanu.container, text="Not selected", fg="red")
+        self.existing_database_label.grid(row=9, column=1)
+        b = tk.Button(self.kanu.container, text="Browse", command=self.specify_existing_database_directory)
         b.grid(row=9, column=2)
         self.option2_button = tk.Button(self.kanu.container, text="Go with Option 2", command=self.go_with_option2)
         self.option2_button.grid(row=10, column=0, columnspan=3)
         self.option2_button["state"] = tk.DISABLED
+        if self.new_database_directory is not None:
+            self.new_database_label.configure(text=os.path.basename(self.new_database_directory), fg="lime green")
+        if self.document_directory is not None:
+            self.document_label.configure(text=os.path.basename(self.document_directory), fg="lime green")
+        if self.new_database_label["text"] != "Not selected" and self.document_label["text"] != "Not selected":
+            self.option1_button["state"] = tk.NORMAL
+        if self.existing_database_directory is not None:
+            self.existing_database_label.configure(text=os.path.basename(self.existing_database_directory), fg="lime green")
+            self.option2_button["state"] = tk.NORMAL
 
     def query(self):
         self.memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
@@ -137,6 +152,7 @@ class DocGPT:
         return message
 
     def go_with_option1(self):
+        self.database_directory = self.new_database_directory
         self.tokens = self.price = 0
         documents = []
         for root, dirs, files in os.walk(self.document_directory):
@@ -162,6 +178,7 @@ class DocGPT:
         self.query()
 
     def go_with_option2(self):
+        self.database_directory = self.existing_database_directory
         self.tokens = self.price = 0
         self.existing = True
         self.query()
@@ -179,17 +196,17 @@ class DocGPT:
         directory_path = filedialog.askdirectory()
         if not directory_path:
             return
-        self.database_directory = directory_path
+        self.new_database_directory = directory_path
         self.new_database_label.configure(text=os.path.basename(directory_path), fg="lime green")
         if self.document_label["text"] != "No file selected":
             self.option1_button["state"] = tk.NORMAL
 
-    def specify_old_database_directory(self):
+    def specify_existing_database_directory(self):
         directory_path = filedialog.askdirectory()
         if not directory_path:
             return
-        self.database_directory = directory_path
-        self.old_database_label.configure(text=os.path.basename(directory_path), fg="lime green")
+        self.existing_database_directory = directory_path
+        self.existing_database_label.configure(text=os.path.basename(directory_path), fg="lime green")
         self.option2_button["state"] = tk.NORMAL
 
     def clear_session(self):

@@ -159,7 +159,18 @@ class KANU:
         if not file_path:
             return
         config.read(file_path)
-        self.deploy_agent("DocGPT", config["USER"]["openai_key"], config["DEFAULT"]["model"], float(config["DEFAULT"]["temperature"]), config["DEFAULT"]["prompt"], config["DEFAULT"]["chunk_size"], config["DEFAULT"]["chunk_overlap"])
+        self.deploy_agent(
+            "DocGPT",
+            config["USER"]["openai_key"],
+            config["DEFAULT"]["model"],
+            float(config["DEFAULT"]["temperature"]),
+            config["DEFAULT"]["prompt"],
+            config["DEFAULT"]["chunk_size"],
+            config["DEFAULT"]["chunk_overlap"],
+            config["OPTIONAL"]["new_database_directory"],
+            config["OPTIONAL"]["document_directory"],
+            config["OPTIONAL"]["existing_database_directory"],
+        )
 
     def template_docgpt_config(self):
         file_path = filedialog.asksaveasfilename()
