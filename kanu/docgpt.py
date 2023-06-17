@@ -38,9 +38,9 @@ class DocGPT:
         prompt,
         default_chunk_size,
         default_chunk_overlap,
-        new_database_directory=None,
-        document_directory=None,
-        existing_database_directory=None,
+        new_database_directory="",
+        document_directory="",
+        existing_database_directory="",
     ):
         self.kanu = kanu
         self.model = model
@@ -112,13 +112,13 @@ class DocGPT:
         self.option2_button = tk.Button(self.kanu.container, text="Go with Option 2", command=self.go_with_option2)
         self.option2_button.grid(row=10, column=0, columnspan=3)
         self.option2_button["state"] = tk.DISABLED
-        if self.new_database_directory is not None:
+        if self.new_database_directory:
             self.new_database_label.configure(text=os.path.basename(self.new_database_directory), fg="lime green")
-        if self.document_directory is not None:
+        if self.document_directory:
             self.document_label.configure(text=os.path.basename(self.document_directory), fg="lime green")
         if self.new_database_label["text"] != "Not selected" and self.document_label["text"] != "Not selected":
             self.option1_button["state"] = tk.NORMAL
-        if self.existing_database_directory is not None:
+        if self.existing_database_directory:
             self.existing_database_label.configure(text=os.path.basename(self.existing_database_directory), fg="lime green")
             self.option2_button["state"] = tk.NORMAL
 

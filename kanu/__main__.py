@@ -179,6 +179,7 @@ class KANU:
         config = configparser.ConfigParser()
         config["DEFAULT"] = {"model": "gpt-3.5-turbo", "temperature": "0.5", "prompt": DOCGPT_PROMPT, "chunk_size": 1000, "chunk_overlap": 50}
         config["USER"] = {"openai_key": ""}
+        config["OPTIONAL"] = {"new_database_directory": "", "document_directory": "", "existing_database_directory": ""}
         with open(file_path, "w") as f:
             config.write(f)
 
