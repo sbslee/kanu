@@ -11,8 +11,9 @@ There are currently two chatbots available in KANU:
 
 Other features of KANU inclde:
 
-- Customize chat settings (e.g. font size and background color)
 - Customize chatbot parameters (e.g. prompt, temperature, and chunk size) by directly using the GUI or uploading a configuration file
+- Customize chat settings (e.g. font size and background color)
+- Display token counter and price monitor in chat window
 
 ## Installation
 
@@ -49,18 +50,13 @@ openai # Required.
 
 ![Alt Text](https://raw.githubusercontent.com/sbslee/kanu/main/images/docgpt.gif)
 
-The following document formats are supported by DocGPT:
-
-- .txt
-- .pdf
-- .doc and .docx
-- .csv
+DocGPT currently supports the following document formats: `.csv`, `.doc`, `.docx`, `.pdf`, and `.txt`.
 
 The following packages are required to run DocGPT:
 
 ```
 langchain    # Required.
-chromadb     # Required. 
+chromadb     # Required.
 tiktoken     # Required.
 pdfminer.six # Optional. Only required for .pdf documents.
 unstructured # Optional. Only required for .doc and .docx documents.

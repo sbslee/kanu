@@ -9,7 +9,7 @@ from langchain.chat_models import ChatOpenAI
 from langchain.chains import ConversationalRetrievalChain
 from langchain.prompts import PromptTemplate
 from langchain.memory import ConversationBufferMemory
-
+from langchain.callbacks import get_openai_callback
 from langchain.document_loaders import (
     TextLoader,
     PDFMinerLoader,
@@ -17,7 +17,8 @@ from langchain.document_loaders import (
     CSVLoader,
 )
 
-from .utils import Tooltip, Settings
+from .gui import Tooltip, Settings, Conversation
+from .utils import tokens2price, text2tokens
 
 DOCUMENT_LOADERS = {
     ".txt": (TextLoader, {"encoding": "utf8"}),
@@ -28,7 +29,19 @@ DOCUMENT_LOADERS = {
 }
 
 class DocGPT:
-    def __init__(self, kanu, openai_key, model, temperature, prompt, default_chunk_size, default_chunk_overlap):
+    def __init__(
+        self,
+        kanu,
+        openai_key,
+        model,
+        temperature,
+        prompt,
+        default_chunk_size,
+        default_chunk_overlap,
+        new_database_directory="",
+        document_directory="",
+        existing_database_directory="",
+    ):
         self.kanu = kanu
         self.model = model
         self.temperature = temperature
@@ -37,11 +50,19 @@ class DocGPT:
         self.default_chunk_overlap = default_chunk_overlap
         os.environ["OPENAI_API_KEY"] = openai_key
         self.settings = Settings(self)
+        self.conversation = Conversation(self)
+        self.tokens = 0
+        self.price = 0
+        self.new_database_directory = new_database_directory
+        self.document_directory = document_directory
+        self.existing_database_directory = existing_database_directory
 
     def run(self):
         self.kanu.container.pack_forget()
         self.kanu.container = tk.Frame(self.kanu.root)
         self.kanu.container.pack()
+        self.kanu.container.bind_all("<Return>", lambda event: self.send_message())
+        self.kanu.container.focus_set()
         l = tk.Label(self.kanu.container, text="DocGPT")
         l.grid(row=0, column=0, columnspan=3)
         b = tk.Button(self.kanu.container, text="Go back", command=lambda: self.kanu.config_docgpt())
@@ -84,13 +105,22 @@ class DocGPT:
         l = tk.Label(self.kanu.container, text="Database ⓘ:")
         Tooltip(l, "Directory where the database is stored.")
         l.grid(row=9, column=0)
-        self.old_database_label = tk.Label(self.kanu.container, text="Not selected", fg="red")
-        self.old_database_label.grid(row=9, column=1)
-        b = tk.Button(self.kanu.container, text="Browse", command=self.specify_old_database_directory)
+        self.existing_database_label = tk.Label(self.kanu.container, text="Not selected", fg="red")
+        self.existing_database_label.grid(row=9, column=1)
+        b = tk.Button(self.kanu.container, text="Browse", command=self.specify_existing_database_directory)
         b.grid(row=9, column=2)
         self.option2_button = tk.Button(self.kanu.container, text="Go with Option 2", command=self.go_with_option2)
         self.option2_button.grid(row=10, column=0, columnspan=3)
         self.option2_button["state"] = tk.DISABLED
+        if self.new_database_directory:
+            self.new_database_label.configure(text=os.path.basename(self.new_database_directory), fg="lime green")
+        if self.document_directory:
+            self.document_label.configure(text=os.path.basename(self.document_directory), fg="lime green")
+        if self.new_database_label["text"] != "Not selected" and self.document_label["text"] != "Not selected":
+            self.option1_button["state"] = tk.NORMAL
+        if self.existing_database_directory:
+            self.existing_database_label.configure(text=os.path.basename(self.existing_database_directory), fg="lime green")
+            self.option2_button["state"] = tk.NORMAL
 
     def query(self):
         self.memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
@@ -102,33 +132,28 @@ class DocGPT:
             chain_type="stuff",
             combine_docs_chain_kwargs={"prompt": PromptTemplate(template=self.prompt, input_variables=["context", "question"])}
         )
-        self.kanu.container.pack_forget()
-        self.kanu.container = tk.Frame(self.kanu.root)
-        self.kanu.container.pack()
-        l = tk.Label(self.kanu.container, text="DocGPT")
-        l.grid(row=0, column=0, columnspan=4)    
-        self.session = tk.Text(self.kanu.container, width=70, height=20)
-        self.session.grid(row=1, column=0, columnspan=4)
-        self.session.tag_config("user", **self.settings.get_user_kwargs())
-        self.session.tag_config("bot", **self.settings.get_bot_kwargs())
-        user_input = tk.Entry(self.kanu.container, width=54)
-        user_input.grid(row=2, column=0, columnspan=4)
-        b = tk.Button(self.kanu.container, text="Send", command=lambda: self.send_message(user_input))
-        b.grid(row=3, column=0)
-        b = tk.Button(self.kanu.container, text="Clear", command=lambda: self.clear_session())
-        b.grid(row=3, column=1)
-        b = tk.Button(self.kanu.container, text="Go back", command=lambda: self.run())
-        b.grid(row=3, column=2)
-        b = tk.Button(self.kanu.container, text="Settings", command=lambda: self.settings.page())
-        b.grid(row=3, column=3)
+        self.conversation.page()
 
-    def send_message(self, entry):
-        self.session.insert(tk.END, "You: " + entry.get() + "\n", "user")
-        response = self.qa(entry.get())["answer"]
-        self.session.insert(tk.END, "Bot: " + response + "\n", "bot")
-        entry.delete(0, tk.END)
+    def send_message(self):
+        self.session.insert(tk.END, "You: " + self.user_input.get() + "\n", "user")
+        with get_openai_callback() as cb:
+            response = self.qa(self.user_input.get())
+            usage = self.calculate_usage(cb)
+        self.session.insert(tk.END, "Bot: " + response["answer"] + "\n", "bot")
+        self.system.insert(tk.END, f"{usage}\n", "system")
+        self.chatbox.delete(0, tk.END)
+
+    def calculate_usage(self, cb):
+        prompt_price = tokens2price(self.model, "prompt", cb.prompt_tokens)
+        completion_price = tokens2price(self.model, "completion", cb.completion_tokens)
+        self.price += prompt_price + completion_price
+        self.tokens += cb.total_tokens
+        message = f"System: Used {cb.prompt_tokens:,} prompt + {cb.completion_tokens:,} completion = {cb.total_tokens:,} tokens (total: {self.tokens:,} or ${self.price:.6f})."
+        return message
 
     def go_with_option1(self):
+        self.database_directory = self.new_database_directory
+        self.tokens = self.price = 0
         documents = []
         for root, dirs, files in os.walk(self.document_directory):
             for file in files:
@@ -142,13 +167,20 @@ class DocGPT:
                 documents.extend(document)
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=self.chunk_size.get(), chunk_overlap=self.chunk_overlap.get())
         texts = text_splitter.split_documents(documents)
-        db = Chroma.from_documents(texts, OpenAIEmbeddings(), persist_directory=self.database_directory)
+        for text in texts:
+            self.tokens += text2tokens("text-embedding-ada-002", text.page_content)
+        self.price = tokens2price("text-embedding-ada-002", "embedding", self.tokens)
+        db = Chroma.from_documents(texts, OpenAIEmbeddings(model="text-embedding-ada-002"), persist_directory=self.database_directory)
         db.add_documents(texts)
         db.persist()
         db = None
+        self.existing = False
         self.query()
 
     def go_with_option2(self):
+        self.database_directory = self.existing_database_directory
+        self.tokens = self.price = 0
+        self.existing = True
         self.query()
 
     def specify_document_directory(self):
@@ -164,19 +196,20 @@ class DocGPT:
         directory_path = filedialog.askdirectory()
         if not directory_path:
             return
-        self.database_directory = directory_path
+        self.new_database_directory = directory_path
         self.new_database_label.configure(text=os.path.basename(directory_path), fg="lime green")
         if self.document_label["text"] != "No file selected":
             self.option1_button["state"] = tk.NORMAL
 
-    def specify_old_database_directory(self):
+    def specify_existing_database_directory(self):
         directory_path = filedialog.askdirectory()
         if not directory_path:
             return
-        self.database_directory = directory_path
-        self.old_database_label.configure(text=os.path.basename(directory_path), fg="lime green")
+        self.existing_database_directory = directory_path
+        self.existing_database_label.configure(text=os.path.basename(directory_path), fg="lime green")
         self.option2_button["state"] = tk.NORMAL
 
     def clear_session(self):
-        self.session.delete(1.0, tk.END)
-
+        self.existing = True
+        self.tokens = self.price = 0
+        self.query()
