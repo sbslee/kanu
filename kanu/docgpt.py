@@ -168,7 +168,7 @@ class DocGPT:
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=self.chunk_size.get(), chunk_overlap=self.chunk_overlap.get())
         texts = text_splitter.split_documents(documents)
         for text in texts:
-            self.tokens += text2tokens("text-embedding-ada-002", text.page_content)
+            self.tokens += 2 * text2tokens("text-embedding-ada-002", text.page_content)
         self.price = tokens2price("text-embedding-ada-002", "embedding", self.tokens)
         db = Chroma.from_documents(texts, OpenAIEmbeddings(model="text-embedding-ada-002"), persist_directory=self.database_directory)
         db.add_documents(texts)
