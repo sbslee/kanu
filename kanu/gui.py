@@ -61,7 +61,7 @@ class Conversation:
         data += self.agent.system.get("1.0", tk.END).rstrip()
         data += "\n\n[Session]\n"
         data += self.agent.session.get("1.0", tk.END).rstrip()
-        with open(file_path, 'w') as f:
+        with open(file_path, 'w', encoding="utf-8") as f:
             f.write(data)
 
 class Settings:
