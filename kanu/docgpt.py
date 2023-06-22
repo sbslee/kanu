@@ -25,7 +25,7 @@ DOCUMENT_LOADERS = {
     ".pdf": (PDFMinerLoader, {}),
     ".doc": (UnstructuredWordDocumentLoader, {}),
     ".docx": (UnstructuredWordDocumentLoader, {}),
-    ".csv": (CSVLoader, {}),
+    ".csv": (CSVLoader, {"encoding": "utf8"}),
 }
 
 class DocGPT:
