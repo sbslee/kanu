@@ -206,7 +206,7 @@ class KANU:
         l = tk.Label(self.container, text="Model:")
         l.grid(row=6, column=0, columnspan=2)
         self.model = tk.StringVar(self.container, value="gpt-3.5-turbo-0613")
-        om = ttk.OptionMenu(self.container, self.model, *GPT_MODELS)
+        om = ttk.OptionMenu(self.container, self.model, "gpt-3.5-turbo-0613", *GPT_MODELS)
         om.grid(row=7, column=0, columnspan=2)
         l = tk.Label(self.container, text="System message ⓘ:")
         Tooltip(l, "The system message helps set the behavior of the chatbot.")
@@ -217,20 +217,26 @@ class KANU:
         self.prompt.grid(row=9, column=0, columnspan=2, sticky="nsew")
         sb.grid(row=9, column=2, sticky="ns")
         self.prompt["yscrollcommand"] = sb.set
+        l = tk.Label(self.container, text="Function script:")
+        l.grid(row=10, column=0, columnspan=2)
+        b = tk.Button(self.container, text="Browse", command=self.get_function_script)
+        b.grid(row=11, column=0)
+        b = tk.Button(self.container, text="Example", command=self.example_function_script)
+        b.grid(row=11, column=1)
         l = tk.Label(self.container, text="Temperature ⓘ:")
         Tooltip(l, "The randomness in generating responses, which ranges between 0 and 1, with 0 indicating almost deterministic behavior.")
-        l.grid(row=10, column=0, columnspan=2)
+        l.grid(row=12, column=0, columnspan=2)
         self.temperature = tk.DoubleVar(self.container, value=0.5)
         e = tk.Entry(self.container, textvariable=self.temperature)
-        e.grid(row=11, column=0, columnspan=2)
-        l = tk.Label(self.container, text="OpenAI API key:")
-        l.grid(row=12, column=0, columnspan=2)
-        e = tk.Entry(self.container)
         e.grid(row=13, column=0, columnspan=2)
+        l = tk.Label(self.container, text="OpenAI API key:")
+        l.grid(row=14, column=0, columnspan=2)
+        e = tk.Entry(self.container)
+        e.grid(row=15, column=0, columnspan=2)
         b = tk.Button(self.container, text="Submit", command=lambda: self.deploy_agent("FuncGPT", e.get(), self.model.get(), self.temperature.get(), self.prompt.get("1.0", "end-1c")))
-        b.grid(row=14, column=0)
+        b.grid(row=16, column=0)
         b = tk.Button(self.container, text="Go back", command=lambda: self.homepage())
-        b.grid(row=14, column=1)
+        b.grid(row=16, column=1)
 
     def parse_funcgpt_config(self):
         config = configparser.ConfigParser()
@@ -238,17 +244,31 @@ class KANU:
         if not file_path:
             return
         config.read(file_path)
-        self.deploy_agent("FuncGPT", config["USER"]["openai_key"], config["DEFAULT"]["model"], float(config["DEFAULT"]["temperature"]), config["DEFAULT"]["prompt"])
+        self.deploy_agent("FuncGPT", config["USER"]["openai_key"], config["DEFAULT"]["model"], float(config["DEFAULT"]["temperature"]), config["DEFAULT"]["prompt"], config["USER"]["function_script"])
 
     def template_funcgpt_config(self):
         file_path = filedialog.asksaveasfilename()
         if not file_path:
             return
         config = configparser.ConfigParser()
-        config["DEFAULT"] = {"model": "gpt-3.5-turbo", "temperature": "0.5", "prompt": FUNCGPT_PROMPT}
+        config["DEFAULT"] = {"model": "gpt-3.5-turbo-0613", "temperature": "0.5", "prompt": FUNCGPT_PROMPT}
         config["USER"] = {"openai_key": ""}
+        config["USER"] = {"function_script": ""}
         with open(file_path, "w") as f:
             config.write(f)
+
+    def get_function_script(self):
+        file_path = filedialog.askopenfilename()
+        if not file_path:
+            return
+        self.script = file_path
+
+    def example_function_script(self):
+        file_path = filedialog.asksaveasfilename()
+        if not file_path:
+            return       
+        with open(file_path, "w") as f:
+            f.write('@@')
 
     def deploy_agent(self, agent, *args, **kwargs):
         if agent == "ChatGPT":

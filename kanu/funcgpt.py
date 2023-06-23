@@ -1,4 +1,6 @@
 import tkinter as tk
+import importlib.util
+import json
 
 import openai
 
@@ -6,16 +8,28 @@ from .gui import Settings, Conversation
 from .utils import tokens2price
 
 class FuncGPT:
-    def __init__(self, kanu, openai_key, model, temperature, prompt):
+    def __init__(
+            self,
+            kanu,
+            openai_key,
+            model,
+            temperature,
+            prompt,
+            function_script
+    ):
         self.kanu = kanu
         self.model = model
         self.temperature = temperature
         self.prompt = prompt
+        self.function_script = function_script
         openai.api_key = openai_key
         self.settings = Settings(self)
         self.conversation = Conversation(self)
         self.tokens = 0
         self.price = 0
+        module_name = "imported_module"
+        loader = importlib.machinery.SourceFileLoader(module_name, self.function_script)
+        self.module = loader.load_module()
 
     def run(self):
         self.conversation.page()
@@ -28,8 +42,29 @@ class FuncGPT:
             model=self.model,
             messages=self.messages,
             temperature=self.temperature,
+            functions=[self.module.openai_functions[0][1]],
+            function_call="auto",
         )
-        response = bot_response["choices"][0]["message"]["content"]
+        message = bot_response["choices"][0]["message"]
+        if message.get("function_call"):
+            function_name = message["function_call"]["name"]
+            function_args = json.loads(message["function_call"]["arguments"])
+            function_response = self.module.openai_functions[0][0](**function_args)
+            second_response = openai.ChatCompletion.create(
+                model=self.model,
+                messages=[
+                    {"role": "user", "content": "What is the weather like in boston?"},
+                    message,
+                    {
+                        "role": "function",
+                        "name": function_name,
+                        "content": function_response,
+                    },
+                ],
+            )
+            response = second_response["choices"][0]["message"]["content"]
+        else:
+            response = bot_response["choices"][0]["message"]["content"]
         self.messages += [{"role": "assistant", "content": response}]
         self.session.insert(tk.END, "You: " + self.user_input.get() + "\n", "user")
         self.session.insert(tk.END, f"Bot: " + response + "\n", "bot")
