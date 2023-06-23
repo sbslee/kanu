@@ -7,6 +7,8 @@ class Conversation:
         self.name = self.agent.__class__.__name__
         if self.name == "ChatGPT":
             self.go_back = self.agent.kanu.config_chatgpt
+        elif self.name == "FuncGPT":
+            self.go_back = self.agent.kanu.config_funcgpt
         else:
             self.go_back = self.agent.run
 
