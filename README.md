@@ -8,7 +8,7 @@ There are currently two chatbots available in KANU:
 
 - [ChatGPT](#chatgpt) harnesses the power of ChatGPT, bringing it directly to your local computer
 - [DocGPT](#docgpt) allows you to effortlessly interact with your documents and ask questions about them
-- [FuncGPT](#fucgpt) can answer your questions by making calls to external tools, APIs, or databases
+- [FuncGPT](#funcgpt) can answer your questions by making calls to external tools, APIs, or databases
 
 Other features of KANU inclde:
 
