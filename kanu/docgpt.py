@@ -138,9 +138,8 @@ class DocGPT:
         self.session.insert(tk.END, "You: " + self.user_input.get() + "\n", "user")
         with get_openai_callback() as cb:
             response = self.qa(self.user_input.get())
-            usage = self.calculate_usage(cb)
+            self.calculate_usage(cb)
         self.session.insert(tk.END, "Bot: " + response["answer"] + "\n", "bot")
-        self.system.insert(tk.END, f"{usage}\n", "system")
         self.chatbox.delete(0, tk.END)
 
     def calculate_usage(self, cb):
@@ -149,7 +148,7 @@ class DocGPT:
         self.price += prompt_price + completion_price
         self.tokens += cb.total_tokens
         message = f"System: Used {cb.prompt_tokens:,} prompt + {cb.completion_tokens:,} completion = {cb.total_tokens:,} tokens (total: {self.tokens:,} or ${self.price:.6f})."
-        return message
+        self.system.insert(tk.END, f"{message}\n", "system")
 
     def go_with_option1(self):
         self.database_directory = self.new_database_directory

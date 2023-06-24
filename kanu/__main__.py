@@ -16,6 +16,39 @@ DOCGPT_PROMPT = """Use the following pieces of context to answer the question at
 Question: {question}
 Helpful Answer:"""
 FUNCGPT_PROMPT = """You are a helpful assistant."""
+FUNCGPT_EXAMPLE = """import json
+
+def get_current_weather(location, unit="fahrenheit"):
+    weather_info = {
+        "location": location,
+        "temperature": "72",
+        "unit": unit,
+        "forecast": ["sunny", "windy"],
+    }
+    return json.dumps(weather_info)
+
+get_current_weather_json = {
+    "name": "get_current_weather",
+    "description": "Get the current weather in a given location",
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "location": {
+                "type": "string",
+                "description": "The city and state, e.g. San Francisco, CA",
+            },
+            "unit": {"type": "string", "enum": ["celsius", "fahrenheit"]},
+        },
+        "required": ["location"],
+    },
+}
+
+functions = {
+    "get_current_weather": {
+        "function": get_current_weather,
+        "json": get_current_weather_json,
+    }
+}"""
 
 class KANU:
     def __init__(self, root):
@@ -252,8 +285,7 @@ class KANU:
             return
         config = configparser.ConfigParser()
         config["DEFAULT"] = {"model": "gpt-3.5-turbo-0613", "temperature": "0.5", "prompt": FUNCGPT_PROMPT}
-        config["USER"] = {"openai_key": ""}
-        config["USER"] = {"function_script": ""}
+        config["USER"] = {"openai_key": "", "function_script": ""}
         with open(file_path, "w") as f:
             config.write(f)
 
@@ -268,7 +300,7 @@ class KANU:
         if not file_path:
             return       
         with open(file_path, "w") as f:
-            f.write('@@')
+            f.write(FUNCGPT_EXAMPLE)
 
     def deploy_agent(self, agent, *args, **kwargs):
         if agent == "ChatGPT":
