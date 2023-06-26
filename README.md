@@ -67,6 +67,8 @@ tabulate     # Optional. Only required for .doc and .docx documents.
 <a id="funcgpt"></a>
 ### FuncGPT
 
+![Alt Text](https://raw.githubusercontent.com/sbslee/kanu/main/images/funcgpt.gif)
+
 The following packages are required to run FuncGPT:
 
 ```
