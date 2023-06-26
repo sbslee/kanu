@@ -33,8 +33,7 @@ class ChatGPT:
         self.messages += [{"role": "assistant", "content": response}]
         self.session.insert(tk.END, "You: " + self.user_input.get() + "\n", "user")
         self.session.insert(tk.END, f"Bot: " + response + "\n", "bot")
-        usage = self.calculate_usage(bot_response)
-        self.system.insert(tk.END, f"{usage}\n", "system")
+        self.calculate_usage(bot_response)
         self.chatbox.delete(0, tk.END)
 
     def calculate_usage(self, response):
@@ -46,7 +45,7 @@ class ChatGPT:
         self.price += prompt_price + completion_price
         self.tokens += total_tokens
         message = f"System: Used {prompt_tokens:,} prompt + {completion_tokens:,} completion = {total_tokens:,} tokens (total: {self.tokens:,} or ${self.price:.6f})."
-        return message
+        self.system.insert(tk.END, f"{message}\n", "system")
 
     def clear_session(self):
         self.tokens = self.price = 0

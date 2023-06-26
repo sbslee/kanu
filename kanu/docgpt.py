@@ -25,7 +25,7 @@ DOCUMENT_LOADERS = {
     ".pdf": (PDFMinerLoader, {}),
     ".doc": (UnstructuredWordDocumentLoader, {}),
     ".docx": (UnstructuredWordDocumentLoader, {}),
-    ".csv": (CSVLoader, {}),
+    ".csv": (CSVLoader, {"encoding": "utf8"}),
 }
 
 class DocGPT:
@@ -138,9 +138,8 @@ class DocGPT:
         self.session.insert(tk.END, "You: " + self.user_input.get() + "\n", "user")
         with get_openai_callback() as cb:
             response = self.qa(self.user_input.get())
-            usage = self.calculate_usage(cb)
+            self.calculate_usage(cb)
         self.session.insert(tk.END, "Bot: " + response["answer"] + "\n", "bot")
-        self.system.insert(tk.END, f"{usage}\n", "system")
         self.chatbox.delete(0, tk.END)
 
     def calculate_usage(self, cb):
@@ -149,7 +148,7 @@ class DocGPT:
         self.price += prompt_price + completion_price
         self.tokens += cb.total_tokens
         message = f"System: Used {cb.prompt_tokens:,} prompt + {cb.completion_tokens:,} completion = {cb.total_tokens:,} tokens (total: {self.tokens:,} or ${self.price:.6f})."
-        return message
+        self.system.insert(tk.END, f"{message}\n", "system")
 
     def go_with_option1(self):
         self.database_directory = self.new_database_directory
@@ -168,7 +167,7 @@ class DocGPT:
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=self.chunk_size.get(), chunk_overlap=self.chunk_overlap.get())
         texts = text_splitter.split_documents(documents)
         for text in texts:
-            self.tokens += text2tokens("text-embedding-ada-002", text.page_content)
+            self.tokens += 2 * text2tokens("text-embedding-ada-002", text.page_content)
         self.price = tokens2price("text-embedding-ada-002", "embedding", self.tokens)
         db = Chroma.from_documents(texts, OpenAIEmbeddings(model="text-embedding-ada-002"), persist_directory=self.database_directory)
         db.add_documents(texts)

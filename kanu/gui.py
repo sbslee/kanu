@@ -7,6 +7,8 @@ class Conversation:
         self.name = self.agent.__class__.__name__
         if self.name == "ChatGPT":
             self.go_back = self.agent.kanu.config_chatgpt
+        elif self.name == "FuncGPT":
+            self.go_back = self.agent.kanu.config_funcgpt
         else:
             self.go_back = self.agent.run
 
@@ -61,7 +63,7 @@ class Conversation:
         data += self.agent.system.get("1.0", tk.END).rstrip()
         data += "\n\n[Session]\n"
         data += self.agent.session.get("1.0", tk.END).rstrip()
-        with open(file_path, 'w') as f:
+        with open(file_path, 'w', encoding="utf-8") as f:
             f.write(data)
 
 class Settings:

@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 0.8.0 (2023-06-26)
+* Enable ChatGPT to answer questions by making calls to external tools, APIs, or databases.
+
 ## 0.7.0 (2023-06-19)
 * Implement token counter and price monitor in chat window.
 * Enable the Enter key for sending messages in chat window.

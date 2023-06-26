@@ -8,6 +8,7 @@ There are currently two chatbots available in KANU:
 
 - [ChatGPT](#chatgpt) harnesses the power of ChatGPT, bringing it directly to your local computer
 - [DocGPT](#docgpt) allows you to effortlessly interact with your documents and ask questions about them
+- [FuncGPT](#funcgpt) can answer your questions by making calls to external tools, APIs, or databases
 
 Other features of KANU inclde:
 
@@ -61,6 +62,17 @@ tiktoken     # Required.
 pdfminer.six # Optional. Only required for .pdf documents.
 unstructured # Optional. Only required for .doc and .docx documents.
 tabulate     # Optional. Only required for .doc and .docx documents.
+```
+
+<a id="funcgpt"></a>
+### FuncGPT
+
+![Alt Text](https://raw.githubusercontent.com/sbslee/kanu/main/images/funcgpt.gif)
+
+The following packages are required to run FuncGPT:
+
+```
+openai # Required.
 ```
 
 ## Changelog
