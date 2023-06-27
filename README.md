@@ -75,6 +75,8 @@ The following packages are required to run FuncGPT:
 openai # Required.
 ```
 
+There may be additional dependencies depending on the external tools, APIs, or databases you use.
+
 ## Changelog
 
 See the [CHANGELOG.md](https://github.com/sbslee/kanu/blob/main/CHANGELOG.md) file for details.
