@@ -46,6 +46,18 @@ The following packages are required to run ChatGPT:
 openai # Required.
 ```
 
+You can customize the chatbot parameters by directly editing the configuration file or by using the GUI. The configuration file is in the following format:
+
+```
+[DEFAULT]
+model = gpt-3.5-turbo
+temperature = 0.5
+prompt = You are a helpful assistant.
+
+[USER]
+openai_key = 
+```
+
 <a id="docgpt"></a>
 ### DocGPT
 
@@ -64,6 +76,30 @@ unstructured # Optional. Only required for .doc and .docx documents.
 tabulate     # Optional. Only required for .doc and .docx documents.
 ```
 
+You can customize the chatbot parameters by directly editing the configuration file or by using the GUI. The configuration file is in the following format:
+
+```
+[DEFAULT]
+model = gpt-3.5-turbo
+temperature = 0.5
+prompt = Use the following pieces of context to answer the question at the end. If you don't know the answer, just say that you don't know, don't try to make up an answer.
+	
+	{context}
+	
+	Question: {question}
+	Helpful Answer:
+chunk_size = 1000
+chunk_overlap = 50
+
+[USER]
+openai_key = 
+
+[OPTIONAL]
+new_database_directory = 
+document_directory = 
+existing_database_directory = 
+```
+
 <a id="funcgpt"></a>
 ### FuncGPT
 
@@ -76,6 +112,20 @@ openai # Required.
 ```
 
 There may be additional dependencies depending on the external tools, APIs, or databases you use.
+
+You can customize the chatbot parameters by directly editing the configuration file or by using the GUI. The configuration file is in the following format:
+
+```
+[DEFAULT]
+[DEFAULT]
+model = gpt-3.5-turbo-0613
+temperature = 0.5
+prompt = You are a helpful assistant.
+
+[USER]
+openai_key = 
+function_script = 
+```
 
 ## Changelog
 
