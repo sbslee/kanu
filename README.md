@@ -117,7 +117,6 @@ You can customize the chatbot parameters by directly editing the configuration f
 
 ```
 [DEFAULT]
-[DEFAULT]
 model = gpt-3.5-turbo-0613
 temperature = 0.5
 prompt = You are a helpful assistant.
