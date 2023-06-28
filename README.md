@@ -127,6 +127,44 @@ openai_key =
 function_script = 
 ```
 
+Note that the script provided by the user must contain a variable defined as `functions`, which is imported by FuncGPT. Below is an example script:
+
+```
+import json
+
+def get_current_weather(location, unit="fahrenheit"):
+    weather_info = {
+        "location": location,
+        "temperature": "72",
+        "unit": unit,
+        "forecast": ["sunny", "windy"],
+    }
+    return json.dumps(weather_info)
+
+get_current_weather_json = {
+    "name": "get_current_weather",
+    "description": "Get the current weather in a given location",
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "location": {
+                "type": "string",
+                "description": "The city and state, e.g. San Francisco, CA",
+            },
+            "unit": {"type": "string", "enum": ["celsius", "fahrenheit"]},
+        },
+        "required": ["location"],
+    },
+}
+
+functions = {
+    "get_current_weather": {
+        "function": get_current_weather,
+        "json": get_current_weather_json,
+    }
+}
+```
+
 ## Changelog
 
 See the [CHANGELOG.md](https://github.com/sbslee/kanu/blob/main/CHANGELOG.md) file for details.
