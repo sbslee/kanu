@@ -24,17 +24,25 @@ class ChatGPT:
         if not self.messages:
             self.messages.append({"role": "system", "content": self.prompt})
         self.messages += [{"role": "user", "content": self.user_input.get()}]
-        bot_response = openai.ChatCompletion.create(
-            model=self.model,
-            messages=self.messages,
-            temperature=self.temperature,
-        )
-        response = bot_response["choices"][0]["message"]["content"]
-        self.messages += [{"role": "assistant", "content": response}]
-        self.session.insert(tk.END, "You: " + self.user_input.get() + "\n", "user")
-        self.session.insert(tk.END, f"Bot: " + response + "\n", "bot")
-        self.calculate_usage(bot_response)
-        self.chatbox.delete(0, tk.END)
+        try: 
+            response = openai.ChatCompletion.create(
+                model=self.model,
+                messages=self.messages,
+                temperature=self.temperature,
+            )
+            answer = response["choices"][0]["message"]["content"]
+            self.messages += [{"role": "assistant", "content": answer}]
+            self.session.insert(tk.END, "You: " + self.user_input.get() + "\n", "user")
+            self.session.insert(tk.END, f"Bot: " + answer + "\n", "bot")
+            self.calculate_usage(response)
+            self.chatbox.delete(0, tk.END)
+        except openai.error.InvalidRequestError as e:
+            error = str(e)
+            if "Please reduce the length of the messages." in error:
+                self.system.insert(tk.END, f"System: {error} You can also create a new chat session.\n", "system")
+                self.messages.pop()
+            else:
+                raise
 
     def calculate_usage(self, response):
         total_tokens = response["usage"]["total_tokens"]
