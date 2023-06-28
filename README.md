@@ -68,6 +68,7 @@ DocGPT currently supports the following document formats: `.csv`, `.doc`, `.docx
 The following packages are required to run DocGPT:
 
 ```
+openai       # Required.
 langchain    # Required.
 chromadb     # Required.
 tiktoken     # Required.
