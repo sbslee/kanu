@@ -112,7 +112,7 @@ The following packages are required to run FuncGPT:
 openai # Required.
 ```
 
-There may be additional dependencies depending on the external tools, APIs, or databases you use.
+There may be additional dependencies depending on the external tools, APIs, or databases you use. You are responsible for installing these dependencies.
 
 You can customize the chatbot parameters by directly editing the configuration file or by using the GUI. The configuration file is in the following format:
 
@@ -127,7 +127,7 @@ openai_key =
 function_script = 
 ```
 
-Note that the script provided by the user must contain a variable defined as `functions`, which is imported by FuncGPT. Below is an example script:
+Note that the script provided by the user must contain a dictionary variable defined as `functions`, which is imported by FuncGPT. Below is an example script:
 
 ```
 import json
