@@ -113,7 +113,7 @@ class KANU:
         sb.grid(row=9, column=2, sticky="ns")
         self.prompt["yscrollcommand"] = sb.set
         l = tk.Label(self.container, text="Temperature ⓘ:")
-        Tooltip(l, "The randomness in generating responses, which ranges between 0 and 1, with 0 indicating almost deterministic behavior.")
+        Tooltip(l, "The randomness in generating responses, which ranges between 0 and 2, with 0 indicating almost deterministic behavior.")
         l.grid(row=10, column=0, columnspan=2)
         self.temperature = tk.DoubleVar(self.container, value=0.5)
         e = tk.Entry(self.container, textvariable=self.temperature)
@@ -185,7 +185,7 @@ class KANU:
         sb.grid(row=16, column=2, sticky="ns")
         self.prompt["yscrollcommand"] = sb.set
         l = tk.Label(self.container, text="Temperature ⓘ:")
-        Tooltip(l, "The randomness in generating responses, which ranges between 0 and 1, with 0 indicating almost deterministic behavior.")
+        Tooltip(l, "The randomness in generating responses, which ranges between 0 and 2, with 0 indicating almost deterministic behavior.")
         l.grid(row=17, column=0, columnspan=2)
         self.temperature = tk.DoubleVar(self.container, value=0.5)
         e = tk.Entry(self.container, textvariable=self.temperature)
@@ -267,7 +267,7 @@ class KANU:
         b = tk.Button(self.container, text="Example", command=self.example_function_script)
         b.grid(row=11, column=1)
         l = tk.Label(self.container, text="Temperature ⓘ:")
-        Tooltip(l, "The randomness in generating responses, which ranges between 0 and 1, with 0 indicating almost deterministic behavior.")
+        Tooltip(l, "The randomness in generating responses, which ranges between 0 and 2, with 0 indicating almost deterministic behavior.")
         l.grid(row=12, column=0, columnspan=2)
         self.temperature = tk.DoubleVar(self.container, value=0.5)
         e = tk.Entry(self.container, textvariable=self.temperature)
