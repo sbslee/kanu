@@ -55,11 +55,7 @@ class FuncGPT:
                     messages=[
                         {"role": "user", "content": self.user_input.get()},
                         message,
-                        {
-                            "role": "function",
-                            "name": function_name,
-                            "content": function_response,
-                        },
+                        {"role": "function", "name": function_name, "content": function_response},
                     ],
                 )
                 self.calculate_usage(second_response, function=function_name)
