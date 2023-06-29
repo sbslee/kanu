@@ -37,14 +37,14 @@ class FuncGPT:
             self.messages.append({"role": "system", "content": self.prompt})
         self.messages += [{"role": "user", "content": self.user_input.get()}]
         try:
-            bot_response = openai.ChatCompletion.create(
+            first_response = openai.ChatCompletion.create(
                 model=self.model,
                 messages=self.messages,
                 temperature=self.temperature,
                 functions=[x["json"] for x in self.module.functions.values()],
                 function_call="auto",
             )
-            message = bot_response["choices"][0]["message"]
+            message = first_response["choices"][0]["message"]
             if message.get("function_call"):
                 function_name = message["function_call"]["name"]
                 function_args = json.loads(message["function_call"]["arguments"])
@@ -63,13 +63,13 @@ class FuncGPT:
                     ],
                 )
                 self.calculate_usage(second_response, function=function_name)
-                response = second_response["choices"][0]["message"]["content"]
+                answer = second_response["choices"][0]["message"]["content"]
             else:
-                response = bot_response["choices"][0]["message"]["content"]
-            self.messages += [{"role": "assistant", "content": response}]
+                answer = first_response["choices"][0]["message"]["content"]
+            self.messages += [{"role": "assistant", "content": answer}]
             self.session.insert(tk.END, "You: " + self.user_input.get() + "\n", "user")
-            self.session.insert(tk.END, f"Bot: " + response + "\n", "bot")
-            self.calculate_usage(bot_response)
+            self.session.insert(tk.END, f"Bot: " + answer + "\n", "bot")
+            self.calculate_usage(first_response)
             self.chatbox.delete(0, tk.END)
         except openai.error.InvalidRequestError as e:
             error = str(e)
