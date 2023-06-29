@@ -50,6 +50,7 @@ class FuncGPT:
                 function_args = json.loads(message["function_call"]["arguments"])
                 function_response = self.module.functions[function_name]["function"](**function_args)
                 second_response = openai.ChatCompletion.create(
+                    temperature=self.temperature,
                     model=self.model,
                     messages=[
                         {"role": "user", "content": self.user_input.get()},
