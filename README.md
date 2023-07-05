@@ -9,7 +9,7 @@ There are currently four chatbots available in KANU:
 - [ChatGPT](#chatgpt) harnesses the power of OpenAI's ChatGPT, bringing it directly to your local computer
 - [DocGPT](#docgpt) allows you to effortlessly interact with your documents and ask questions about them
 - [FuncGPT](#funcgpt) can answer your questions by making calls to external tools, APIs, or databases
-- [ChatPaLM](#chatpalm) harnesses the power of Google's PaML API, bringing it directly to your local computer
+- [ChatPaLM](#chatpalm) harnesses the power of Google's PaLM API, bringing it directly to your local computer
 
 Other features of KANU inclde:
 
@@ -169,7 +169,7 @@ functions = {
 <a id="chatpalm"></a>
 ### ChatPaLM
 
-![Alt Text](https://raw.githubusercontent.com/sbslee/kanu/main/images/chatgpt.gif)
+![Alt Text](https://raw.githubusercontent.com/sbslee/kanu/main/images/chatpalm.gif)
 
 The following packages are required to run ChatPaLM:
 
