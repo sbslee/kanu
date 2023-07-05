@@ -31,6 +31,7 @@ class ChatPaLM:
         self.session.insert(tk.END, "You: " + self.user_input.get() + "\n", "user")
         self.session.insert(tk.END, f"Bot: " + response.last + "\n", "bot")
         self.chatbox.delete(0, tk.END)
+        self.system.insert(tk.END, f"System: Communicated with PaLM API.\n", "system")
 
     def clear_session(self):
         self.tokens = self.price = 0
