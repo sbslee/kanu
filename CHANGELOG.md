@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 0.9.0 (in development)
+## 0.9.0 (2023-07-05)
 * Enhance chatbot handling of content length exceeding maximum limit.
 * Add chat functionality using Google's PaLM API.
 
