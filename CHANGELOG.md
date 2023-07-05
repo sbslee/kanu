@@ -2,6 +2,7 @@
 
 ## 0.9.0 (in development)
 * Enhance chatbot handling of content length exceeding maximum limit.
+* Add chat functionality using Google's PaLM API.
 
 ## 0.8.0 (2023-06-26)
 * Enable ChatGPT to answer questions by making calls to external tools, APIs, or databases.

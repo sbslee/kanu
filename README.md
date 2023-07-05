@@ -4,11 +4,12 @@
 
 Welcome to KANU, a minimalistic Python-based GUI for various chatbots.
 
-There are currently three chatbots available in KANU:
+There are currently four chatbots available in KANU:
 
-- [ChatGPT](#chatgpt) harnesses the power of ChatGPT, bringing it directly to your local computer
+- [ChatGPT](#chatgpt) harnesses the power of OpenAI's ChatGPT, bringing it directly to your local computer
 - [DocGPT](#docgpt) allows you to effortlessly interact with your documents and ask questions about them
 - [FuncGPT](#funcgpt) can answer your questions by making calls to external tools, APIs, or databases
+- [ChatPaLM](#chatpalm) harnesses the power of Google's PaML API, bringing it directly to your local computer
 
 Other features of KANU inclde:
 
@@ -163,6 +164,29 @@ functions = {
         "json": get_current_weather_json,
     }
 }
+```
+
+<a id="chatpalm"></a>
+### ChatPaLM
+
+![Alt Text](https://raw.githubusercontent.com/sbslee/kanu/main/images/chatgpt.gif)
+
+The following packages are required to run ChatPaLM:
+
+```
+google.generativeai # Required.
+```
+
+You can customize the chatbot parameters by directly editing the configuration file or by using the GUI. The configuration file is in the following format:
+
+```
+[DEFAULT]
+model = chat-bison-001
+temperature = 0.5
+prompt = You are a helpful assistant.
+
+[USER]
+google_key = 
 ```
 
 ## Changelog

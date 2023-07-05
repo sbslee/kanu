@@ -9,6 +9,8 @@ class Conversation:
             self.go_back = self.agent.kanu.config_chatgpt
         elif self.name == "FuncGPT":
             self.go_back = self.agent.kanu.config_funcgpt
+        elif self.name == "ChatPaLM":
+            self.go_back = self.agent.kanu.config_chatpalm
         else:
             self.go_back = self.agent.run
 
