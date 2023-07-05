@@ -2,6 +2,7 @@ import os
 import tkinter as tk
 from tkinter import filedialog
 
+import openai
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import Chroma
@@ -135,12 +136,19 @@ class DocGPT:
         self.conversation.page()
 
     def send_message(self):
-        self.session.insert(tk.END, "You: " + self.user_input.get() + "\n", "user")
-        with get_openai_callback() as cb:
-            response = self.qa(self.user_input.get())
-            self.calculate_usage(cb)
-        self.session.insert(tk.END, "Bot: " + response["answer"] + "\n", "bot")
-        self.chatbox.delete(0, tk.END)
+        try:
+            with get_openai_callback() as cb:
+                response = self.qa(self.user_input.get())
+                self.calculate_usage(cb)
+            self.session.insert(tk.END, "You: " + self.user_input.get() + "\n", "user")
+            self.session.insert(tk.END, "Bot: " + response["answer"] + "\n", "bot")
+            self.chatbox.delete(0, tk.END)
+        except openai.error.InvalidRequestError as e:
+            error = str(e)
+            if "Please reduce the length of the messages." in error:
+                self.system.insert(tk.END, f"System: {error} You can also create a new chat session.\n", "system")
+            else:
+                raise
 
     def calculate_usage(self, cb):
         prompt_price = tokens2price(self.model, "prompt", cb.prompt_tokens)
