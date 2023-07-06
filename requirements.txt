@@ -1,0 +1,8 @@
+chromadb
+google.generativeai
+langchain
+openai
+pdfminer.six
+tabulate
+tiktoken
+unstructured
