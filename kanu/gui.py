@@ -23,7 +23,9 @@ class Conversation:
         self.agent.kanu.container.focus_set()
         l = tk.Label(self.agent.kanu.container, text=self.name)
         l.grid(row=0, column=0, sticky="ew")
-        self.agent.system = tk.Text(self.agent.kanu.container, height=7)
+        paned_window = tk.PanedWindow(self.agent.kanu.container, orient=tk.VERTICAL)
+        paned_window.grid(row=1, column=0, sticky="nsew")
+        self.agent.system = tk.Text(paned_window, height=7)
         self.agent.system.tag_configure("system", **self.agent.settings.get_system_kwargs())
         if self.name == "DocGPT":
             if self.agent.existing:
@@ -31,17 +33,17 @@ class Conversation:
             else:
                 self.agent.system.insert(tk.END, f"System: Creating new database. Embedding used {self.agent.tokens:,} tokens or ${self.agent.price:.6f}.\n", "system")
         self.agent.system.insert(tk.END, f"System: A new chat session has been created using {self.agent.model}.\n", "system")
-        self.agent.system.grid(row=1, column=0, sticky="ew")
-        self.agent.session = tk.Text(self.agent.kanu.container)
-        self.agent.session.grid(row=2, column=0, sticky="nsew")
+        self.agent.session = tk.Text(paned_window)
         self.agent.session.tag_config("user", **self.agent.settings.get_user_kwargs())
         self.agent.session.tag_config("bot", **self.agent.settings.get_bot_kwargs())
+        paned_window.add(self.agent.system)
+        paned_window.add(self.agent.session)
         self.agent.user_input = tk.StringVar()
         self.agent.chatbox = tk.Entry(self.agent.kanu.container, textvariable=self.agent.user_input)
-        self.agent.chatbox.grid(row=3, column=0, sticky="ew")
+        self.agent.chatbox.grid(row=2, column=0, sticky="ew")
         self.agent.messages = []
         button_frame = tk.Frame(self.agent.kanu.container)
-        button_frame.grid(row=4, column=0, sticky="ew")
+        button_frame.grid(row=3, column=0, sticky="ew")
         b = tk.Button(button_frame, text="Send", command=lambda: self.agent.send_message())
         b.grid(row=0, column=0, sticky="ew")
         b = tk.Button(button_frame, text="Clear", command=lambda: self.agent.clear_session())
@@ -53,7 +55,7 @@ class Conversation:
         b = tk.Button(button_frame, text="Save", command=lambda: self.save())
         b.grid(row=0, column=4, sticky="ew")
         self.agent.kanu.container.grid_columnconfigure(0, weight=1)
-        self.agent.kanu.container.grid_rowconfigure(2, weight=1)
+        self.agent.kanu.container.grid_rowconfigure(1, weight=1)
         for i in range(5):
             button_frame.grid_columnconfigure(i, weight=1)
 

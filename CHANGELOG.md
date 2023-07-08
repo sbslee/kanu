@@ -1,6 +1,7 @@
 # CHANGELOG
 
 ## 0.10.0 (in development)
+* Enable dynamic resizing of system vs. chat sessions.
 
 ## 0.9.0 (2023-07-05)
 * Enhance chatbot handling of content length exceeding maximum limit.
